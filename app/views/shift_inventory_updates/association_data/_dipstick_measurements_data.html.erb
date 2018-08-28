@@ -1,0 +1,148 @@
+<div class="dipstick-measurements-data row flex-nowrap">
+    <div class="col dipstick-measurement-items-container blurrable-panel">
+        <div class="dipstick-measurement-items p-3">
+            <table class="table table-bordered" id="table-dipstickMeasurements">
+                <thead>
+                    <th>Tank</th>
+                    <th>Beginning Amt.</th>
+                    <th>Deliveries</th>
+                    <th>Dispensed</th>
+                    <th>Ending Amt.</th>
+                    <th>Dipstick Amt.</th>
+                    <th>Diff.</th>
+                </thead>
+                <tbody>
+                    <% @tanks.each do |tank| %>
+                        <% 
+                            dipstick_measurement = tank.dipstick_measurements.find_by(
+                                shift_inventory_update_id: @shift_inventory_update.id
+                            )
+                        %>
+                        <tr>
+                            <td>
+                                <div class="fuel-text-<%= tank.fuel.ref_color %>">
+                                    <%= tank.fuel.symbols[0] %>
+                                </div>
+                                <div class="fs-pt8">
+                                    <%= tank.alias %>
+                                </div>
+                            </td>
+                            <% if dipstick_measurement.nil? %>
+                                <td class="text-center text-muted" colspan="6">
+                                    <em>No record</em>
+                                </td>
+                            <% else %>
+                                <td>
+                                    <% if !dipstick_measurement.chron_prev.nil? %>
+                                        <span>
+                                            <%=
+                                                number_with_precision(
+                                                    dipstick_measurement.beginning_amt,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </span>
+                                        <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="test test test">
+                                        </a>
+                                    <% elsif !dipstick_measurement.nearest_prev.nil? %>
+                                        <span>
+                                            <%=
+                                                number_with_precision(
+                                                    dipstick_measurement.beginning_amt,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </span>
+                                        <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="test test test">
+                                        </a>
+                                    <% else %>
+                                        <span class="text-muted">n/a</span>
+                                        <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="test test test">
+                                        </a>
+                                    <% end %>
+                                </td>
+                                <td>
+                                    <%= 
+                                        number_with_precision(
+                                            dipstick_measurement.deliveries,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <%= 
+                                        number_with_precision(
+                                            dipstick_measurement.dispensed,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <% if dipstick_measurement.beginning_amt.nil? %>
+                                        <div class="none-icon"></div>
+                                    <% else %>
+                                        <%= 
+                                            number_with_precision(
+                                                dipstick_measurement.ending_amt,
+                                                precision: 2,
+                                                delimiter: ','
+                                            )
+                                        %>
+                                    <% end %>
+                                </td>
+                                <td>
+                                    <%= 
+                                        number_with_precision(
+                                            dipstick_measurement.converted_vol,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <% if dipstick_measurement.beginning_amt.nil? %>
+                                        <div class="none-icon"></div>
+                                    <% else %>
+                                        <div>
+                                            <%= 
+                                                number_with_precision(
+                                                    dipstick_measurement.difference,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </div>
+                                    <% end %>
+                                    <div class="fs-pt8">
+                                        (<%= 
+                                            number_with_precision(
+                                                dipstick_measurement.difference_pct * 100,
+                                                precision: 2
+                                            )
+                                        %>%)
+                                    </div>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

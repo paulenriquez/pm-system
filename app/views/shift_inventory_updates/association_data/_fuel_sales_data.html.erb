@@ -1,0 +1,52 @@
+<div class="fuel-sales-data row">
+    <div class="col-4 fuel-sale-items-container">
+        <div class="fuel-sales-items p-3">
+            <table class="table table-bordered table-compressed" id="table-fuelSales">
+                <thead>
+                    <th>Tank</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <% @tanks.each do |tank| %>
+                        <%
+                            fuel_sale = tank.fuel_sales.find_by(
+                                shift_inventory_update_id: @shift_inventory_update.id
+                            )
+                        %>
+                        <tr>
+                            <td>
+                                <div class="fuel-text-<%= tank.fuel.ref_color %>">
+                                    <%= tank.fuel.symbols[0] %>
+                                </div>
+                                <div class="fs-pt8">
+                                    <%= tank.alias %>
+                                </div>
+                            </td>
+                            <% if fuel_sale.nil? %>
+                                <td class="text-center text-muted">
+                                    <em>No record</em>
+                                </td>
+                            <% else %>
+                                <td>
+                                    <%=
+                                        number_with_precision(
+                                            fuel_sale.dispensed,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col fuel-sales-summary-container">
+        <div class="fuel-sales-summary-header d-flex align-items-center pl-3 pr-3 ">
+            <a href="#" class="btn btn-link pl-0 mdi mdi-minus"></a>
+            <h6 class="mb-0">Summary</h6>
+        </div>
+    </div>
+</div>

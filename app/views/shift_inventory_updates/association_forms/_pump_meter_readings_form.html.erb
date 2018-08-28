@@ -1,0 +1,32 @@
+<div class="pump-meter-readings-form">
+    <div class="row">
+        <div class="col-10">
+            <div class="alert alert-info fs-pt9 p-2 pl-3 pr-3">
+                    <% expected_prev = @shift_inventory_update.expected_prev %>
+                    The values under <em>beginning balance</em> were taken from the <em>ending balance</em> of the
+                    previous pump meter reading, or from the records of <strong><%= expected_prev[:date].strftime('%b %d, %Y (%a)') %>, 
+                    Shift # <%= expected_prev[:shift] %></strong>. If the previous one isn't available, the system will
+                    use the latest available record instead.
+            </div>
+            <table class="table table-bordered pump-nozzle-based-table" id="table-pumpMeterReadings">
+                <thead>
+                    <th colspan="3">Pump Nozzle</th>
+                    <th style="display:none;"></th>
+                    <th style="display:none;"></th>
+                    <th>Beginning Bal.</th>
+                    <th>Ending Bal.</th>
+                    <th>Adj.</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <%= 
+                        shift_inventory_update.simple_fields_for :pump_meter_readings,
+                        @shift_inventory_update.pump_meter_readings_by_pump_nozzle do |pump_meter_reading|
+                    %>
+                        <%= render 'shift_inventory_updates/association_forms/pump_meter_reading_fields', pump_meter_reading: pump_meter_reading %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

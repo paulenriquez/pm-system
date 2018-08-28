@@ -1,0 +1,75 @@
+<%= simple_form_for @product.becomes(Product), controller: 'products', html: {class: 'form-partial'} do |product| %>
+    <transition name="fade" mode="out-in">
+        <div v-cloak class="form-group mb-0" v-if="product.type == null" key="no-type">
+            <label>Select the type of product you want to create.</label>
+            <div class="list-group list-group-horizontal equal-width">
+                <a href="#" class="list-group-item list-group-item-action" @click="changeType('Fuel')">
+                    <h6>Fuel</h6>
+                    <p class="mb-0 fs-pt9">Includes all primary motor-fuel products dispensed through the station's pump nozzles.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action" @click="changeType('NonFuel')">
+                    <h6>Non-Fuel</h6>
+                    <p class="mb-0 fs-pt9">Includes LPG's, Lubricants, Specialties, and all other non motor-fuel related products.</p>
+                </a>
+            </div>
+        </div>
+
+        <div v-cloak v-else-if="product.type != null" key="has-type">
+            <div class="form-group">
+                <label class="required">Type</label>
+                <div class="card">
+                    <div class="card-body as-input">
+                        <h6 class="mt-1 mb-0" v-if="product.type === 'Fuel'">Fuel</h6>
+                        <h6 class="mt-1 mb-0" v-else-if="product.type === 'NonFuel'">Non-Fuel</h6>
+
+                        <p class="mt-1 mb-1 fs-pt9" v-if="<%= action_name == 'new' || action_name == 'create' %>">
+                            To change the type, <a href="#" class="card-link" @click="changeType(null)">click here</a>. Take note, however, that once you click the link, all field values will be reset.
+                        </p>
+                        <p class="mt-1 mb-1 fs-pt9" v-else-if="<%= action_name == 'edit' || action_name == 'update' %>">
+                            The type cannot be changed anymore since this product record has already been created.
+                        </p>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-2 p-2 pl-3 pr-3 fs-pt8">
+                    You won't be able to modify the type once the product has been created.
+                </div>
+            </div>
+
+            <div class="form-group" v-if="product.type === 'NonFuel'">
+                <label class="required">Classification</label>
+                <input class="form-control" placeholder="E.g. Gasul, Lubricants, Specialties, etc" v-model="product.classification">
+                <small class="form-text text-muted">Use this to classify different non-fuel products.</small>
+            </div>
+
+            <div class="form-group">
+                <label class="required">Name</label>
+                <input class="form-control" placeholder="Product name" v-model="product.name">
+                <small class="form-text text-muted">Enter the full, unabbreviated, name of the product.</small>
+            </div>
+
+            <div class="form-group" v-if="product.type === 'Fuel'">
+                <label class="required">Symbols</label>
+                <input class="form-control" placeholder="E.g. XYZ, ABC D, EFG 1, etc." v-model="product.symbols">
+                <small class="form-text text-muted">Separate each symbol with a comma. First symbol will be used as the primary symbol.</small>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" placeholder="Short description of the product" rows="3" v-model="product.description"></textarea>
+            </div>
+
+            <%= product.submit 'Save', 'v-if': 'product.type != null', class: 'btn btn-primary' %>
+        </div>
+    </transition>
+    
+    <!-- HIDDEN FIELDS -->
+    <%= product.hidden_field :type,           id: 'product_type',           'v-bind:value': 'product.type' %>
+    <%= product.hidden_field :name,           id: 'product_name',           'v-bind:value': 'product.name' %>
+    <%= 
+        product.hidden_field :symbols, multiple: true, value: @product.symbols.nil? ? '' : @product.symbols.join(', '),
+            id: 'product_symbols', 'v-bind:value': 'product.symbols'
+    %>
+    <%= product.hidden_field :classification, id: 'product_classification', 'v-bind:value': 'product.classification' %>
+    <%= product.hidden_field :description,    id: 'product_description',    'v-bind:value': 'product.description'    %>
+   
+<% end %>

@@ -1,0 +1,28 @@
+<tr class="calibration-item" data-fuel-id="<%= calibration.object.pump_nozzle.tank.fuel.id %>">
+    <td class="pump-island-col">
+        <%= calibration.object.pump_nozzle.pump_island_num %>
+    </td>
+    <td class="loading-point-col">
+        <%= calibration.object.pump_nozzle.loading_point_num %>
+    </td>
+    <td class="fuel-col">
+        <div class="fuel-text-<%= calibration.object.pump_nozzle.tank.fuel.ref_color %>">
+            <%= calibration.object.pump_nozzle.tank.fuel.symbols[0] %>
+        </div>
+        <div class="fs-pt8">
+            <%= calibration.object.pump_nozzle.tank.alias %>
+        </div>
+    </td>
+    <td class="amount-col">
+        <div class="input-group">
+            <input class="form-control" id="input-amount" autocomplete="off">
+            <div class="input-group-append">
+                <span class="input-group-text">L</span>
+            </div>
+        </div>
+    </td>
+    <td style="display:none;">
+        <%= calibration.hidden_field :pump_nozzle_id, class: 'pump-nozzle-id-field' %>
+        <%= calibration.hidden_field :amount,         class: 'amount-field'         %>
+    </td>
+</tr>

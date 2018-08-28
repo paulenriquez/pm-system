@@ -1,0 +1,48 @@
+<div class="main-navbar card-shadow-1">
+    <div class="left-section">
+        <div class="navbar-section">
+            
+        </div>
+    </div>
+    <div class="right-section">
+        <div class="navbar-section pl-3">
+            <% if current_user.is_admin? %>
+                <a href="<%= users_path %>" class="edit-link btn btn-sm
+                    btn-light btn-light-darker mr-2
+                    mdi mdi-account-multiple with-icon">
+                    Manage Accounts
+                </a>
+            <% end %>
+        </div>
+        <div class="navbar-section pl-3 border-left">
+            <span>
+                Logged in as:
+            </span>
+            <button class="btn btn-link dropdown-toggle" type="button"
+                data-toggle="dropdown">
+                @<%= current_user.username %>
+            </button>
+            <div class="dropdown-menu account-actions-dropdown">
+                <div class="account-info">
+                    <h1 class="mdi mdi-account-circle text-primary mb-2"></h1>
+                    <h3 class="font-weight-light mb-1">
+                        @<%= current_user.username %>
+                    </h3>
+                    <h6 class="font-weight-normal mb-3">
+                        <%= current_user.name %> (<%= current_user.position %>)
+                    </h6>
+                    
+                    <div class="fs-pt875 font-weight-bold mdi mdi-account-card-details">
+                        <%= current_user.is_admin? ? 'Administrator' : 'Regular'%> Privileges
+                    </div>
+                </div>
+                <hr>
+                
+                <div class="w-100 d-flex align-items-center justify-content-between">
+                    <a href="#" class="btn btn-link">Edit account</a>
+                    <%= link_to 'Sign out', destroy_user_session_path, method: :delete, class: 'btn btn-link text-danger' %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

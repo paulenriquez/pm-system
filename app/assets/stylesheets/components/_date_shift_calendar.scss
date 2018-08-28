@@ -1,0 +1,75 @@
+.date-shift-calendar {
+    .calendar-container {
+        border-right: 1px solid $card-border-color;
+
+        .calendar-cells table {
+            th, td {
+                padding: 0.85rem;
+                vertical-align: top;
+                width: 14.285%;
+                border-radius: 0;
+            }
+
+            td {
+                .today:before {
+                    background-color: $primary;
+                }
+
+                &.active {
+                    background-color: $primary;
+                    .today:before {
+                        background-color: $white;
+                    }
+                }
+            }
+            
+
+            .prev, .picker-switch, .next {
+                border-top: none;
+                border-radius: 0;
+            }
+            .prev {
+                border-top-left-radius: $card-border-radius;
+            }
+            .picker-switch {
+                pointer-events: none;
+            }
+        }
+
+        .calendar-actions {
+            height: 3rem;
+            border-top: 1px solid $card-border-color;
+            display: flex;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            
+        }
+
+    }
+
+    .shift-links-container {
+        .date-text {
+            width: 100%;
+            text-align: center;
+            padding-top: 1rem;
+        }
+        .shift-links {
+            .shift-link {
+                margin-bottom: 0;
+
+                &:not(:first-child) {
+                    border-top: none;
+                }
+            }
+            .shift-link .shift-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
+
+    
+}

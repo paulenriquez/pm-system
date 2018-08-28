@@ -1,0 +1,56 @@
+// Font
+$browser-base-font-size: 14px;
+
+// Brand Colors
+$petron-color-primary: #00216c;
+$petron-color-secondary: #0e3a93;
+$petron-color-grayed-out: #eff1f6;
+$petron-color-accent: #e2001e;
+
+// Elements and Components
+$base-background-color: $petron-color-grayed-out;
+
+$main-sidebar-width: 16rem;
+$main-sidebar-header-height: 5rem;
+$main-sidebar-header-bg: $petron-color-primary;
+
+$main-sidebar-items-container-padding: 1rem 1rem 1rem 0.8rem;
+$main-sidebar-items-container-bg: $petron-color-secondary;
+
+$main-sidebar-menu-margin-bottom: 1rem;
+
+$main-sidebar-submenu-margin-left: 0.75rem;
+$main-sidebar-submenu-padding-x: 0.4rem;
+
+$main-sidebar-label-margin-bottom: 0.25rem;
+$main-sidebar-label-letter-spacing: 0.15rem;
+$main-sidebar-label-font-size: 0.8rem;
+$main-sidebar-label-color: lighten($petron-color-secondary, 40%);
+
+$main-sidebar-item-border-radius: 0.3rem;
+$main-sidebar-item-font-size: 1rem;
+$main-sidebar-item-padding: 0.35rem 0.6rem;
+$main-sidebar-item-margin-bottom: 0.1rem;
+$main-sidebar-item-color: rgba(255,255,255,0.95);
+
+$main-sidebar-subitem-font: 0.975rem;
+$main-sidebar-subitem-padding: 0.342rem 0.586rem;
+
+$main-navbar-height: 3rem;
+$main-navbar-background-color: #fff;
+
+$main-content-padding: 20px;
+$main-content-padding-bottom: 100px;
+$main-content-loading-dimmer-bg: rgba(255,255,255,0.55);
+$main-content-loading-blur: 5px;
+
+// Fuel Reference Colors
+$fuel-ref-colors: (
+    'blue': #0d47a1,
+    'blue-grey': #263238,
+    'green': #1b5e20,
+    'orange': #e65100,
+    'red': #c62828,
+    'teal': #004d40,
+    'violet': #311b92
+)

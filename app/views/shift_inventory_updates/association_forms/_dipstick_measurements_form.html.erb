@@ -1,0 +1,31 @@
+<div class="dipstick-measurements-form">
+    <div class="alert alert-info fs-pt9 p-2 pl-3 pr-3">
+            <% expected_prev = @shift_inventory_update.expected_prev %>
+            The values under <em>beginning amount</em> were taken from the <em>ending amount</em> of the
+            previous dipstick measurement, or from the records of <strong><%= expected_prev[:date].strftime('%b %d, %Y (%a)') %>,
+            Shift # <%= expected_prev[:shift] %></strong>. If the previous one isn't available, the system will use
+            the latest available record instead.
+    </div>
+    <table class="table table-bordered" id="table-dipstickMeasurements">
+        <thead> 
+            <th>Fuel Tank</th>
+            <th>Beginning Amt.</th>
+            <th>Deliveries</th>
+            <th>Dispensed</th>
+            <th>Ending Amt.</th>
+            <th>Dipstick Amt.</th>
+            <th colspan="2">Difference</th>
+        </thead>
+        <tbody>
+            <%= 
+                shift_inventory_update.simple_fields_for :dipstick_measurements,
+                @shift_inventory_update.dipstick_measurements_by_tank do |dipstick_measurement|
+            %>
+                <%= 
+                    render 'shift_inventory_updates/association_forms/dipstick_measurement_fields',
+                        dipstick_measurement: dipstick_measurement
+                %>
+            <% end %>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,41 @@
+<div class="row m-0">
+    <div class="col pl-0">
+        <div class="card card-shadow-1 users-table-container">
+            <div class="card-body">
+                <h5 class="card-title">Manage Accounts</h5>
+                <a class="btn btn-secondary mb-4" href="<%= new_user_path %>">
+                    Create new user
+                </a>
+                <table class="table table-compressed">
+                    <thead>
+                        <th>Username</th>
+                        <th>Administrator?</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        <% @users.each do |user| %>
+                            <tr>
+                                <td>@<%= user.username %></td>
+                                <td>
+                                    <%= user.is_admin? ? 'Yes' : 'No' %>
+                                </td>
+                                <td>
+                                    <%= user.name %>
+                                </td>
+                                <td>
+                                    <%= user.position %>
+                                </td>
+                                <td class="text-center">
+                                    <%= link_to 'Edit', edit_user_path(user), class: 'btn btn-link' %>
+                                    <%= link_to 'Delete', user_path(user), method: :delete, class: 'btn btn-link text-danger' %>
+                                </td>
+                            </tr>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

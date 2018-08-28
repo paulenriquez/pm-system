@@ -1,0 +1,33 @@
+<div class="pump-reconciliation-totals-form">
+    <div class="row">
+        <div class="col-9 pump-reconciliation-totals-table-container">
+            <div class="alert alert-info fs-pt9 p-2 pl-3 pr-3">
+                    <% expected_prev = @shift_inventory_update.expected_prev %>
+                    The values under <em>beginning balance</em> were taken from the <em>ending balance</em> of the
+                    previous pump reconciliation total, or from the records of <strong><%= expected_prev[:date].strftime('%b %d, %Y (%a)') %>,
+                    Shift # <%= expected_prev[:shift] %></strong>. If the previous one isn't available, the system will use
+                    the latest available record instead.
+            </div>
+            <table class="table table-bordered" id="table-pumpReconciliationTotals">
+                <thead>
+                    <th>Fuel</th>
+                    <th>Beginning Bal.</th>
+                    <th>Ending Bal.</th>
+                    <th>Total Adj.</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <%=
+                        shift_inventory_update.simple_fields_for :pump_reconciliation_totals,
+                            @shift_inventory_update.pump_reconciliation_totals_by_product do |pump_reconciliation_total|    
+                    %>
+                        <%= 
+                            render 'shift_inventory_updates/association_forms/pump_reconciliation_total_fields',
+                                pump_reconciliation_total: pump_reconciliation_total
+                        %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

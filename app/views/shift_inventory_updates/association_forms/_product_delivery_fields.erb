@@ -1,0 +1,21 @@
+<tr class="product-delivery-item">
+    <td class="description-col">
+
+    </td>
+    <td class="qty-delivered-col">
+    
+    </td>
+    <td>
+        <%= 
+            link_to_remove_association '', product_delivery,
+                wrapper_class: 'product-delivery-item',
+                class: 'mdi mdi-close-circle remove-item'
+        %>
+    </td>
+
+    <td style="display:none;">
+        <%= product_delivery.hidden_field :product_id,    class: 'product-id-field'    %>
+        <%= product_delivery.hidden_field :tank_id,       class: 'tank-id-field'       %>
+        <%= product_delivery.hidden_field :qty_delivered, class: 'qty-delivered-field' %>
+    </td>
+</tr>

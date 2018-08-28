@@ -1,0 +1,139 @@
+<div class="calibrations-data row">
+    <div class="col-8 calibration-items-container">
+        <div class="calibration-items p-3">
+            <table class="table table-bordered pump-nozzle-based-table" id="table-calibrations">
+                <thead>
+                    <th colspan="3">Pump Nozzle</th>
+                    <th style="display:none;"></th>
+                    <th style="display:none;"></th>
+                    <th>Amount</th>
+                </thead>
+                <tbody>
+                    <% @pump_nozzles.each do |pump_nozzle| %>
+                        <%
+                            calibration = pump_nozzle.calibrations.find_by(
+                                shift_inventory_update_id: @shift_inventory_update.id
+                            )
+                        %>
+                        <tr>
+                            <td><%= pump_nozzle.pump_island_num %></td>
+                            <td><%= pump_nozzle.loading_point_num %></td>
+                            <td>
+                                <div class="fuel-text-<%= pump_nozzle.tank.fuel.ref_color %>">
+                                    <%= pump_nozzle.tank.fuel.symbols[0] %>
+                                </div>
+                                <div class="fs-pt8">
+                                    <%= pump_nozzle.tank.alias %>
+                                </div>
+                            </td>
+                            <% if calibration.nil? %>
+                                <td class="text-muted text-center">
+                                    <em>No record</em>
+                                </td>
+                            <% else %>
+                                <td>
+                                    <%=
+                                        number_with_precision(
+                                            calibration.amount,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col calibrations-summary-container">
+        <div class="calibrations-summary-header d-flex align-items-center pl-3 pr-3 ">
+            <a href="#" class="btn btn-link pl-0 mdi mdi-minus"></a>
+            <h6 class="mb-0">Summary</h6>
+        </div>
+        <div class="calibrations-summary p-3">
+            <div class="card summary-table mb-3">
+                <div class="card-header">
+                    Total Calibrations by Fuel
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Fuel</th>
+                            <th class="text-right">Tot. Calibration</th>
+                        </thead>
+                        <tbody>
+                            <% total_calibrations_by_fuel = @shift_inventory_update.calibration_summary(:total_calibrations_by_fuel) %>
+                            <% if total_calibrations_by_fuel.empty? %>
+
+                            <% else %>
+                                <% total_calibrations_by_fuel.each do |sumary_item| %>
+                                    <% fuel = @fuels.find(sumary_item[:fuel_id]) %>
+                                    <tr>
+                                        <td>
+                                            <span class="badge fuel-badge-<%= fuel.ref_color %>">
+                                                <%= fuel.symbols[0] %>
+                                            </span>
+                                            <%= fuel.name %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%= 
+                                                number_with_precision(
+                                                    sumary_item[:total_calibrations],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card summary-table">
+                <div class="card-header">
+                    Total Calibrations by Tank                
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Tank</th>
+                            <th class="text-right">Tot. Calibrations</th>
+                        </thead>
+                        <tbody>
+                            <% total_calibrations_by_tank = @shift_inventory_update.calibration_summary(:total_calibrations_by_tank) %>
+                            <% if total_calibrations_by_tank.empty? %>
+
+                            <% else %>
+                                <% total_calibrations_by_tank.each do |summary_item| %>
+                                    <% tank = @tanks.find(summary_item[:tank_id]) %>
+                                    <tr>
+                                        <td>
+                                            <span class="badge fuel-badge-<%= tank.fuel.ref_color %>">
+                                                <%= tank.fuel.symbols[0] %>
+                                            </span>
+                                            <%= tank.alias %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_calibrations],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

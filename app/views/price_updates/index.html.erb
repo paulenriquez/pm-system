@@ -1,0 +1,66 @@
+<div class="row-m0">
+    <div class="col pl-0">
+        <div class="card card-shadow-1 price-updates-list-card">
+            <div class="card-body">
+                <h5 class="card-title">All Price Updates</h5>
+                <a href="<%= new_price_update_path %>" class="btn btn-secondary mb-5">
+                    New Price Update
+                </a>
+                <% @price_updates.each do |price_update| %>
+                    <div class="collapsible-card price-update-item">
+                        <div class="collapse-link-container">
+                            <a class="collapse-link"
+                                data-toggle="collapse"
+                                href="#price-update-details-<%= price_update.id %>">
+                                <h6 class="mb-0">
+                                    Price Update
+                                </h6>
+                                <span class="toggle-icon mdi mdi-chevron-down"></span>
+                            </a>
+                        </div>
+                        <div class="collapse collapse-content"
+                            id="price-update-details-<%= price_update.id %>">
+                            <div class="card-body pl-3 pr-3 pb-3 pt-0">
+                                <div class="form-group">
+                                    <label>Price Updates</label>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <th>Product</th>
+                                            <th>Effective On</th>
+                                            <th class="text-right">New Price</th>
+                                        </thead>
+                                        <tbody>
+                                            <% price_update.product_price_updates.each do |product_price_update| %>
+                                                <tr>
+                                                    <td>
+                                                        <%= product_price_update.product.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= product_price_update.effective_on.strftime('%b %d, %Y (%a)') %>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <%=
+                                                            number_with_precision(
+                                                                product_price_update.new_price,
+                                                                precision: 2,
+                                                                delimiter: ','
+                                                            )
+                                                        %>
+                                                    </td>
+                                                </tr>
+                                            <% end %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <textarea class="form-control-plaintext-bordered h-100" readonly><%= price_update.remarks %></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>

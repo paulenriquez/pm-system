@@ -1,0 +1,59 @@
+.date-calendar {
+    .calendar-container {
+        .calendar-cells table {
+            th, td {
+                vertical-align: top;
+                width: 14.285%;
+                border-radius: 0;
+            }
+
+            td {
+                .today:before {
+                    background-color: $primary;
+                }
+
+                &.active {
+                    background-color: $primary;
+                    .today:before {
+                        background-color: $white;
+                    }
+                }
+            }
+
+            .prev, .picker-switch, .next {
+                border-top: none;
+                border-radius: 0;
+            }
+            .prev {
+                border-top-left-radius: $card-border-radius;
+            }
+            .picker-switch {
+                pointer-events: none;
+            }        
+        }
+    }
+
+    .calendar-actions-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid $card-border-color;
+        
+        @extend .pl-2;
+        @extend .pr-2;
+        @extend .pt-1;
+        @extend .pb-1;
+    }
+
+    .load-actions-container {
+        border-top: 2px solid $card-border-color;
+
+        .fade-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            @extend .p-2;
+        }
+    }
+}

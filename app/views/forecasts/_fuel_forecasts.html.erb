@@ -1,0 +1,70 @@
+<div class="fuel-forecast">
+    <table class="table table-compressed table-multi-level-header">
+        <thead>
+            <tr>
+                <th rowspan="2" colspan="2">Fuel</th>
+                <th colspan="7" class="major-header">7-day Forecast</th>
+            </tr>
+            <% (1..7).each do |day_num| %>
+                <th class="minor-header">
+                    <%= ( @date + day_num.days ).strftime('%b %d (%a)') %>
+                </th>
+            <% end %>
+        </thead>
+        <tbody>
+            <% @fuels.each do |fuel| %>
+                <tr>
+                    <td rowspan="2" class="align-middle">
+                        <div class="fuel-text-<%= fuel.ref_color %>">
+                            <%= fuel.symbols[0] %>
+                        </div>
+                    </td>
+                    <td class="">Pred. Vol. Sales</td>
+                    <% 
+                        forecasts = []
+                    %>
+                    <% (1..7).each do |day_num| %>
+                        <td class="align-middle text-right">
+                            <% 
+                                forecast = fuel.forecast(@date + day_num.days, 3)
+                                forecasts << forecast
+                            %>
+                            <h5 class="font-weight-light mb-0">
+                                <%=
+                                    number_with_precision(
+                                        forecast,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            </h5>
+                        </td>   
+                    <% end %>
+                </tr>
+                <tr>
+                    <td class="">Pred. Inventory</td>
+                    <%
+                        available_inventory = fuel.available_inventory(@date)
+                        total_capacity = fuel.tanks.sum(:capacity)
+                    %>
+                    <% forecasts.each do |forecast| %>
+                        <td class="align-middle text-right">
+                            <% available_inventory -= forecast %>
+                             <div class="progress progress-right-to-left">
+                                <div class="progress-bar"
+                                style="width: <%= (available_inventory / total_capacity) * 100 %>%">
+                                    <%= number_with_precision((available_inventory / total_capacity) * 100, precision: 0) %>%
+                                </div>
+                            </div>
+                            <div class="w-100 text-right fs-pt8">
+                                <%= number_with_precision(available_inventory, precision: 2, delimiter: ',') %>
+                                /
+                                <%= number_with_precision(total_capacity, precision: 2, delimiter: ',') %>
+                            </div>
+                        </td>
+                    <% end %>
+                </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

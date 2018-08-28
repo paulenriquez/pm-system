@@ -1,0 +1,87 @@
+<tr class="pump-reconciliation-total-item">
+    <td class="fuel-col">
+        <%= pump_reconciliation_total.object.fuel.name %>
+        <div >
+            <% pump_reconciliation_total.object.fuel.symbols.each do |symbol| %>
+                <span class="badge fuel-badge-<%= pump_reconciliation_total.object.fuel.ref_color %>-sm">
+                    <%= symbol %>
+                </span>
+            <% end %>
+        </div>
+    </td>
+    <td class="beginning-bal-col">
+        <% if !pump_reconciliation_total.object.chron_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        pump_reconciliation_total.object.beginning_bal,
+                        precision: 2,
+                        delimiter: ','
+                    )
+                %>
+            </span>
+            <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="Successfully linked the previous shift's pump reconciliation total to this record.">
+            </a>
+        <% elsif !pump_reconciliation_total.object.nearest_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        pump_reconciliation_total.object.beginning_bal,
+                        precision: 2,
+                        delimiter: ','
+                    ) 
+                %>
+            </span>
+            <%
+                expected_date =  pump_reconciliation_total.object.shift_inventory_update.expected_prev[:date].strftime('%b %d, %Y (%a)')
+                expected_shift =  pump_reconciliation_total.object.shift_inventory_update.expected_prev[:shift]
+                fuel_symbol = pump_reconciliation_total.object.fuel.symbols[0]
+                nearest_date = pump_reconciliation_total.object.nearest_prev.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                nearest_shift = pump_reconciliation_total.object.nearest_prev.shift_inventory_update.shift
+            %>
+            <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-title="Check the previous shift!"
+                data-content="Can't find the <strong><%= "#{expected_date}, Shift # #{expected_shift}" %></strong>
+                    pump reconciliation total for <%= fuel_symbol %>. Took the one from
+                    <%= "#{nearest_date}, Shift # #{nearest_shift}" %> instead.">
+            </a>
+        <% else %>
+            <span class="val text-muted">n/a</span>
+            <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="This is the first pump reconciliation total for this fuel.">
+            </a>
+        <% end %>
+    </td>
+    <td class="ending-bal-col">
+        <div class="input-group">
+            <input class="form-control" id="input-endingBal" autocomplete="off">
+            <div class="input-group-append">
+                <span class="input-group-text">L</span>
+            </div>
+        </div>
+    </td>
+    <td class="calibrations-col">
+    
+    </td>
+    <td class="dispensed-col">
+    
+    </td>
+
+    <td style="display:none;">
+        <%= pump_reconciliation_total.hidden_field :product_id, class: 'product-id-field' %>
+        <%= pump_reconciliation_total.hidden_field :ending_bal, class: 'ending-bal-field' %>
+        <% if !pump_reconciliation_total.object.id.nil? %>
+            <%= pump_reconciliation_total.hidden_field :_destroy, class: '_destroy-field', value: false %>
+        <% end %>
+    </td>
+</tr>

@@ -1,0 +1,87 @@
+<tr class="pump-meter-reading-item" data-tank-id="<%= pump_meter_reading.object.pump_nozzle.tank.id %>">
+    <td class="pump-island-col">
+        <%= pump_meter_reading.object.pump_nozzle.pump_island_num %>
+    </td>
+    <td class="loading-point-col">
+        <%= pump_meter_reading.object.pump_nozzle.loading_point_num %>
+    </td>
+    <td>
+        <div class="fuel-text-<%= pump_meter_reading.object.pump_nozzle.tank.fuel.ref_color %>">
+            <%= pump_meter_reading.object.pump_nozzle.tank.fuel.symbols[0] %>
+        </div>
+        <div class="fs-pt8">
+            <%= pump_meter_reading.object.pump_nozzle.tank.alias %>
+        </div>
+    </td>
+    <td class="beginning-bal-col">
+        <% if !pump_meter_reading.object.chron_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        pump_meter_reading.object.beginning_bal,
+                        precision: 2,
+                        delimiter: ','
+                    )
+                %>
+            </span>
+            <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="Successfully linked the previous shift's pump meter reading to this record.">
+            </a>
+        <% elsif !pump_meter_reading.object.nearest_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        pump_meter_reading.object.beginning_bal,
+                        precision: 2,
+                        delimiter: ','
+                    ) 
+                %>
+            </span>
+            <%
+                expected_date =  pump_meter_reading.object.expected_prev[:date].strftime('%b %d, %Y (%a)')
+                expected_shift =  pump_meter_reading.object.expected_prev[:shift]
+                pump_nozzle_alias = pump_meter_reading.object.pump_nozzle.alias
+                nearest_date = pump_meter_reading.object.nearest_prev.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                nearest_shift = pump_meter_reading.object.nearest_prev.shift_inventory_update.shift
+            %>
+            <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-title="Check the previous shift!"
+                data-content="Can't find the <strong><%= "#{expected_date}, Shift # #{expected_shift}" %></strong>
+                    pump meter reading for <%= pump_nozzle_alias %>. Took the one from
+                    <%= "#{nearest_date}, Shift # #{nearest_shift}" %> instead.">
+            </a>
+        <% else %>
+            <span class="val text-muted">n/a</span>
+            <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="This is the first pump meter reading for this pump nozzle.">
+            </a>
+        <% end %>
+    </td>
+    <td class="ending-bal-col">
+        <div class="input-group">
+            <input class="form-control" id="input-endingBal" autocomplete="off">
+            <div class="input-group-append">
+                <span class="input-group-text">L</span>
+            </div>
+        </div>
+    </td>
+    <td class="calibration-col"></td>
+    <td class="dispensed-col"></td>
+
+    <td style="display:none;">
+        <%= pump_meter_reading.hidden_field :pump_nozzle_id, class: 'pump-nozzle-id-field' %>
+        <%= pump_meter_reading.hidden_field :ending_bal,     class: 'ending-bal-field'     %>
+        <% if !pump_meter_reading.object.id.nil? %>
+            <%= pump_meter_reading.hidden_field :_destroy, class: '_destroy-field', value: false %>
+        <% end %>
+    </td>
+</tr>

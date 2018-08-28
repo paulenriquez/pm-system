@@ -1,0 +1,47 @@
+.price_updates-controller {
+    &.index-view {
+        .price-updates-list-card {
+            width: 45rem;
+            min-height: 60rem;
+        }
+    }
+    
+    .form-container {
+        width: 47.5rem;
+
+        .price-update-nested-form-container {
+            padding-top: $table-cell-padding;
+            padding-left: $table-cell-padding;
+            padding-right: $table-cell-padding; 
+        }
+
+        .product-price-updates-table-container {
+            height: 17.5rem;
+            border-top: 1.5px solid $table-border-color;
+            border-bottom: 1.5px solid $table-border-color;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+
+            #table-productPriceUpdates {
+                th {
+                    border-top: 0px;
+                }
+
+                th:nth-child(1), td:nth-child(1) { 
+                    width: 45%;
+                }
+                th:nth-child(2), td:nth-child(2) { 
+                    width: 25%;
+                }
+                th:nth-child(3), td:nth-child(3) { 
+                    width: 20%;
+                    text-align: right;
+                }
+                th:nth-child(4), td:nth-child(4) { 
+                    width: 10%;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}

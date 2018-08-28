@@ -1,0 +1,20 @@
+<div class="fuel-sales-form">
+    <div class="row">
+        <div class="col-4">
+             <table class="table table-bordered table-compressed" id="table-fuelSales">
+                <thead>
+                    <th>Fuel Tank</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <%=
+                        shift_inventory_update.simple_fields_for :fuel_sales,
+                            @shift_inventory_update.fuel_sales_by_tank do |fuel_sale|
+                    %>
+                        <%= render 'shift_inventory_updates/association_forms/fuel_sale_fields', fuel_sale: fuel_sale %>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

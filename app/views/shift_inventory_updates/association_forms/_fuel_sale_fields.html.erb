@@ -1,0 +1,26 @@
+<tr class="fuel-sale-item">
+    <td>
+        <div class="fuel-text-<%= fuel_sale.object.tank.fuel.ref_color %>">
+            <%= fuel_sale.object.tank.fuel.symbols[0] %>
+        </div>
+        <div class="fs-pt8">
+            <%= fuel_sale.object.tank.alias %>
+        </div>
+    </td>
+    <td class="dispensed-col">
+        <div class="input-group">
+            <input id="input-dispensed" class="form-control" autocomplete="off">
+            <div class="input-group-append">
+                <span class="input-group-text">L</span>
+            </div>
+        </div>
+
+        <td style="display:none;">
+            <%= fuel_sale.hidden_field :tank_id,   class: 'tank-id-field'   %>
+            <%= fuel_sale.hidden_field :dispensed, class: 'dispensed-field' %>
+            <% if !fuel_sale.object.id.nil? %>
+                <%= fuel_sale.hidden_field :_destroy, class: '_destroy-field', value: false %>
+            <% end %>
+        </td>
+    </td>
+</tr>

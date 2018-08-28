@@ -1,0 +1,20 @@
+.admin_account_manager-controller {
+    &.index-view {
+        .users-table-container {
+            width: 50rem;
+            min-height: 30rem;
+
+            table {
+                td {
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+    &.new-view, &.edit-view {
+        .form-container {
+            width: 22.5rem;
+        }
+    }
+}

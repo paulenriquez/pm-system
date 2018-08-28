@@ -1,0 +1,47 @@
+<%==
+    opening_tag = '<div'
+    opening_tag += ' data-value data-text '
+
+    if local_assigns.has_key?(:default_text)
+        opening_tag += " data-default-text='#{default_text}' "
+    else
+        opening_tag += ' data-default-text="Select tank..." '
+    end
+
+    if local_assigns.has_key?(:html)
+        default_classes = 'tank-selector dropdown dropdown-select dropdown-select-search'
+        if html.has_key?(:class)
+            opening_tag += " class='#{default_classes} #{html[:class]}' "
+            html.delete(:class)
+        else
+            opening_tag += " class='#{default_classes}' "
+        end
+        html.each do |k, v|
+            opening_tag += " #{k}='#{v}' "
+        end
+    end
+    opening_tag += '>'
+
+    opening_tag
+%>
+    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+        <span class="dropdown-text">Select tank...</span>
+    </button>
+    <div class="dropdown-menu">
+        <div class="search-and-filter-container">
+            <div class="input-search-container">
+                <div class="input-with-icon left-icon">
+                    <i class="icon mdi mdi-magnify"></i>
+                    <input class="form-control form-control-sm search-box" placeholder="Search...">
+                </div>
+            </div>
+        </div>
+        <div class="items-container">
+            <% @tanks.each do |tank| %>
+                <a class="dropdown-item" data-value="<%= tank.id %>" data-store='{"fuelId": <%= tank.fuel.id %>}' data-text="<%= tank.alias %>">
+                    <%= tank.alias %>
+                </a>
+            <% end %>
+        </div>
+    </div>
+</div>

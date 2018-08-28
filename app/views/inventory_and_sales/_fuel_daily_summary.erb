@@ -1,0 +1,292 @@
+<div class="fuel-daily-summary">
+    <div class="inventory-container mb-5">
+        <h3 class="mb-4 w-100 font-weight-light text-center">
+            Inventory
+        </h3>
+
+        <table class="table table-compressed">
+            <thead>
+                <th>Tank</th>
+                <th class="text-right">Beginning</th>
+                <th class="text-right">Deliveries</th>
+                <th class="text-right">Dispensed</th>
+                <th class="text-right">Ending</th>
+                <th class="text-right">Actual</th>
+                <th class="text-right">Diff.</th>
+                <th class="text-right">Available Stock</th>
+            </thead>
+            <tbody>
+                <% @tanks.each do |tank| %>
+                    <% day_totals = tank.day_totals(@date) %>
+                    <tr>
+                        <td class="align-middle">
+                            <div class="fuel-text-<%= tank.fuel.ref_color %>">
+                                <%= tank.fuel.symbols[0] %>
+                            </div>
+                            <div class="fs-pt8">
+                                <%= tank.alias %>
+                            </div>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% beginning_stock = day_totals[:beginning_stock] %>
+                            <% if beginning_stock.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        beginning_stock,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    day_totals[:total_deliveries],
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    day_totals[:total_dispensed],
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% ending_stock = day_totals[:ending_stock] %>
+                            <% if ending_stock.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        ending_stock,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% actual_count = day_totals[:actual_count] %>
+                            <% if actual_count.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        actual_count,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% difference = day_totals[:difference] %>
+                            <% if difference.nil? %>
+                                <div class="text-muted">n/a</div>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        difference,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                                <div class="fs-pt8">
+                                    (<%=
+                                        number_with_precision(
+                                            day_totals[:difference_pct] * 100,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>%)
+                                </div>
+                            <% end %>
+                        </td>
+                        <td class="align-middle">
+                            <%
+                                available_stock = tank.available_stock(@date)
+                                capacity = tank.capacity
+                            %>
+                            <div class="progress progress-right-to-left">
+                                <div class="progress-bar"
+                                style="width: <%= (available_stock / capacity) * 100 %>%">
+                                    <%= number_with_precision((available_stock / capacity) * 100, precision: 0) %>%
+                                </div>
+                            </div>
+                            <div class="w-100 text-right fs-pt8">
+                                <%= number_with_precision(available_stock, precision: 2, delimiter: ',') %>
+                                /
+                                <%= number_with_precision(capacity, precision: 2, delimiter: ',') %>
+                            </div>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="dispensed-and-revenue-container">
+        <h3 class="mb-4 w-100 font-weight-light text-center">
+            Sales
+        </h3>
+        <div>
+        
+        </div>
+        <div class="dispensed-and-revenue-charts pl-4 pr-4 mb-5 d-flex flex-col justify-content-between">
+            <%=
+                line_chart fuel_volume_by_day_chart_path(date: @date),
+                    defer: false,
+                    xtitle: 'Date',
+                    ytitle: 'Volume (L)',
+                    height: '30rem',
+                    width: '65%',
+                    library: { 
+                        title: { text: 'Daily Fuel Volume' },
+                        animation: { duration: 1000 },
+                        scales: {
+                            xAxes: [{
+                                ticks: { minRotation: 45, maxRotation: 45}
+                            }],
+                            yAxes: [{
+                                ticks: { stepSize: 500 }
+                            }]
+                        }
+                    } 
+            %>
+            <%=
+                pie_chart day_fuel_volume_breakdown_chart_path(date: @date),
+                    defer: false,
+                    donut: true,
+                    legend: 'bottom',
+                    height: '30rem',
+                    width: '25%',
+                    library: { 
+                       title: { text: 'Day Vol. Breakdown' },
+                       animation: { animateRotate: true },
+                       cutoutPercentage: 80
+                    }
+            %>
+        </div>
+        <table class="dispensed-table table table-compressed table-multi-level-header">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="border-right">Tank</th>
+                    <th colspan="4" class="major-header border-right">Dispensed</th>
+                    <th colspan="4" class="major-header">Revenue</th>
+                </tr>
+                <tr>
+                    <th class="text-right minor-header">Shift # 1</th>
+                    <th class="text-right minor-header">Shift # 2</th>
+                    <th class="text-right minor-header">Shift # 3</th>
+                    <th class="text-right minor-header border-right">Total</th>
+                    <th class="text-right minor-header">Shift # 1</th>
+                    <th class="text-right minor-header">Shift # 2</th>
+                    <th class="text-right minor-header">Shift # 3</th>
+                    <th class="text-right minor-header">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% tank_total_dispensed = 0 %>
+                <% tank_total_revenue = 0 %>
+                <% @tanks.each do |tank| %>
+                    <tr>
+                        <td class="align-middle border-right">
+                            <div class="fuel-text-<%= tank.fuel.ref_color %>">
+                                <%= tank.fuel.symbols[0] %>
+                            </div>
+                            <div class="fs-pt8">
+                                <%= tank.alias %>
+                            </div>
+                        </td>
+                        <% tank_dispensed = 0%>
+                        <% [1,2,3].each do |shift| %>
+                            <% total_dispensed = tank.total_dispensed(@date, shift) %>
+                            <td class="align-middle text-right">
+                                <%=
+                                    number_with_precision(
+                                        total_dispensed,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            </td>
+                            <% tank_dispensed += total_dispensed %>
+                        <% end %>
+                        <td class="align-middle text-right font-weight-bold border-right">
+                            <%=
+                                number_with_precision(
+                                    tank_dispensed,
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                            <% tank_total_dispensed += tank_dispensed %>
+                        </td>
+                        <% tank_revenue = 0 %>
+                        <% [1,2,3].each do |shift| %>
+                            <td class="align-middle text-right">
+                                <% total_revenue = tank.total_revenue(@date, shift) %>
+                                <% if total_revenue.nil? %>
+                                    <span class="text-muted">n/a</span>
+                                <% else %>
+                                    <%=
+                                        number_with_precision(
+                                            total_revenue,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                    <% tank_revenue += total_revenue %>
+                                <% end %>
+                            </td>
+                        <% end %>
+                        <td class="align-middle text-right font-weight-bold">
+                            <%=
+                                number_with_precision(
+                                    tank_revenue,
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                            <% tank_total_revenue += tank_revenue %>
+                        </td>
+                    </tr>
+                <% end %>
+                <tr class="last-row">
+                    <td colspan="4" class="align-middle text-right fs-pt875 text-uppercase">
+                        <em>Total Dispensed</em>
+                    </td>
+                    <td class="align-middle text-right font-weight-bold td-uncompressed">
+                        <%=
+                            number_with_precision(
+                                tank_total_dispensed,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                        %>
+                    </td>
+                    <td colspan="3" class="align-middle text-right fs-pt875 text-uppercase">
+                        <em>Total Revenue</em>
+                    </td>
+                    <td class="align-middle text-right font-weight-bold td-uncompressed">
+                        <%=
+                            number_with_precision(
+                                tank_total_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                        %>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

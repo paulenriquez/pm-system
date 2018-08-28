@@ -1,0 +1,28 @@
+<div class="row deliveries-form">
+    <div class="col-3 pr-0">
+        <div class="delivery-list-items-container">
+            <div class="delivery-list-items-header pt-1 pr-3 pb-1 pl-3">
+               <%=
+                    link_to_add_association 'Add Delivery', shift_inventory_update, :deliveries,
+                        partial: 'shift_inventory_updates/association_forms/delivery_fields',
+                        form_name: 'delivery',
+                        class: 'btn btn-sm btn-light-darker btn-with-icon mdi mdi-plus add-delivery-button',
+                        data: {
+                            'association-insertion-node': '.deliveries-form .delivery-form-panels',
+                            'association-insertion-method': 'append'
+                        }
+                %>
+            </div>
+            <div class="list-group delivery-list-items">
+                
+            </div>
+        </div>
+    </div>
+    <div class="col pl-0">
+        <div class="tab-content delivery-form-panels">
+            <%= shift_inventory_update.simple_fields_for :deliveries do |delivery| %>
+                <%= render 'shift_inventory_updates/association_forms/delivery_fields', delivery: delivery %>
+            <% end %>
+        </div>
+    </div>
+</div>

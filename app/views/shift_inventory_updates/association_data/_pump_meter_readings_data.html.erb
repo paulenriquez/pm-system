@@ -1,0 +1,513 @@
+<div class="pump-meter-readings-data row flex-nowrap">
+    <div class="col-10 pump-meter-reading-items-container blurrable-panel"
+    :class="{ 'blurred': associationData.pumpMeterReadings.isSummaryOpen }">
+        <div class="pump-meter-reading-items p-3">
+            <table class="table table-bordered pump-nozzle-based-table" id="table-pumpMeterReadings">
+                <thead>
+                    <th colspan="3">Pump Nozzle</th>
+                    <th style="display:none;"></th>
+                    <th style="display:none;"></th>
+                    <th>Beginning Bal.</th>
+                    <th>Ending Bal.</th>
+                    <th>Adj.</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <% @pump_nozzles.each do |pump_nozzle| %>
+                        <% pump_meter_reading = pump_nozzle.pump_meter_readings.find_by(shift_inventory_update_id: @shift_inventory_update.id) %>
+                        <tr>
+                            <td><%= pump_nozzle.pump_island_num %></td>
+                            <td><%= pump_nozzle.loading_point_num %></td>
+                            <td>
+                                <div class="fuel-text-<%= pump_nozzle.tank.fuel.ref_color %>">
+                                    <%= pump_nozzle.tank.fuel.symbols[0] %>
+                                </div>
+                                <div class="fs-pt8">
+                                    <%= pump_nozzle.tank.alias %>
+                                </div>
+                            </td>
+                            <% if pump_meter_reading.nil? %>
+                                <td class="text-muted text-center" colspan="4">
+                                    <em>No record</em>
+                                </td>
+                            <% else %>
+                                <td>
+                                    <% if !pump_meter_reading.chron_prev.nil? %>
+                                        <span class="val">
+                                            <%= 
+                                                number_with_precision(
+                                                    pump_meter_reading.beginning_bal,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </span>
+                                        <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="Successfully linked the previous shift's pump meter reading to this record.">
+                                        </a>
+                                    <% elsif !pump_meter_reading.nearest_prev.nil? %>
+                                        <span class="val">
+                                            <%= 
+                                                number_with_precision(
+                                                    pump_meter_reading.beginning_bal,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                ) 
+                                            %>
+                                        </span>
+                                        <%
+                                            expected_date =  pump_meter_reading.shift_inventory_update.expected_prev[:date].strftime('%b %d, %Y (%a)')
+                                            expected_shift =  pump_meter_reading.shift_inventory_update.expected_prev[:shift]
+                                            pump_nozzle_alias = pump_meter_reading.pump_nozzle.alias
+                                            nearest_date = pump_meter_reading.nearest_prev.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                                            nearest_shift = pump_meter_reading.nearest_prev.shift_inventory_update.shift
+                                        %>
+                                        <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-title="Check the previous shift!"
+                                            data-content="Can't find the <strong><%= "#{expected_date}, Shift # #{expected_shift}" %></strong>
+                                                pump meter reading for <%= pump_nozzle_alias %>. Took the one from
+                                                <%= "#{nearest_date}, Shift # #{nearest_shift}" %> instead.">
+                                        </a>
+                                    <% else %>
+                                        <span class="val text-muted">n/a</span>
+                                        <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="This is the first pump meter reading for this pump nozzle.">
+                                        </a>
+                                    <% end %>
+                                </td>
+                                <td>
+                                    <%=
+                                        number_with_precision(
+                                            pump_meter_reading.ending_bal,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <% calibration = pump_meter_reading.calibration %>
+                                    <% if !calibration.nil? %>
+                                        <%=
+                                            number_with_precision(
+                                                calibration,
+                                                precision: 2,
+                                                delimiter: ','
+                                            )
+                                        %>
+                                    <% else %>
+                                        0.00
+                                    <% end %>
+                                </td>
+                                <td>
+                                    <% dispensed = pump_meter_reading.dispensed %>
+                                    <% if dispensed.nil? %>
+                                        <div class="none-icon"></div>
+                                    <% else %>
+                                        <%=
+                                            number_with_precision(
+                                                dispensed,
+                                                precision: 2,
+                                                delimiter: ','
+                                            )
+                                        %>
+                                    <% end %>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="collapsible-summary"
+        :class="{ 'shown': associationData.pumpMeterReadings.isSummaryOpen }">
+        <div class="pump-meter-reading-summary-header d-flex align-items-center pl-3 pr-3">
+            <a href="#" class="btn btn-lg btn-link pl-0 mdi"
+            :class="{
+                'mdi-chevron-left': !associationData.pumpMeterReadings.isSummaryOpen,
+                'mdi-chevron-right': associationData.pumpMeterReadings.isSummaryOpen
+            }"
+            @click="associationData.pumpMeterReadings.isSummaryOpen = !associationData.pumpMeterReadings.isSummaryOpen"></a>
+            <h6 class="mb-0">Summary</h6>
+        </div>
+        <div class="pump-meter-reading-summaries p-3">
+            <div class="card summary-table mb-3">
+                <div class="card-header">
+                    Total Beginning, Ending, Calibration, Dispensed, and Revenue by Fuel
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Fuel</th>
+                            <th class="text-right">Tot. Beginning</th>
+                            <th class="text-right">Tot. Ending</th>
+                            <th class="text-right">Tot. Adj.</th>
+                            <th class="text-right">Tot. Dispensed</th>
+                            <th class="text-right">Tot. Revenue</th>
+                        </thead>
+                        <tbody>
+                            <%
+                                all_totals_by_fuel = @shift_inventory_update.pump_meter_reading_summary(:all_totals_by_fuel)
+                            %>
+                            <% if all_totals_by_fuel.empty? %>
+
+                            <% else %>
+                                <% all_totals_by_fuel.each do |summary_item| %>
+                                    <%
+                                        fuel = @fuels.find(summary_item[:fuel_id])
+                                    %>
+                                    <tr>
+                                        <td>
+                                            <span class="badge fuel-badge-<%= fuel.ref_color %>">
+                                                <%= fuel.symbols[0] %>
+                                            </span>
+                                            <%= fuel.name %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_beg_bal].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_beg_bal],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_end_bal],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_calibrations],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_dispensed].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_dispensed],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_revenue].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_revenue],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card summary-table">
+                <div class="card-header">
+                    Total Beginning, Ending, Calibration, Dispensed, and Revenue by Tank
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Tank</th>
+                            <th class="text-right">Tot. Beginning</th>
+                            <th class="text-right">Tot. Ending</th>
+                            <th class="text-right">Tot. Adj.</th>
+                            <th class="text-right">Tot. Dispensed</th>
+                            <th class="text-right">Tot. Revenue</th>
+                        </thead>
+                        <tbody>
+                            <%
+                                all_totals_by_tank = @shift_inventory_update.pump_meter_reading_summary(:all_totals_by_tank)
+                            %>
+                            <% if all_totals_by_tank.empty? %>
+
+                            <% else %>
+                                <% all_totals_by_tank.each do |summary_item| %>
+                                    <%
+                                        tank = @tanks.find(summary_item[:tank_id])
+                                    %>
+                                    <tr>
+                                        <td>
+                                            <span class="badge fuel-badge-<%= tank.fuel.ref_color %>">
+                                                <%= tank.fuel.symbols[0] %>
+                                            </span>
+                                            <%= tank.alias %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_beg_bal].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_beg_bal],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_end_bal],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_calibrations],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_dispensed].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_dispensed],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                        <td class="text-right">
+                                            <% if summary_item[:total_revenue].nil? %>
+                                                <span class="text-muted">n/a</span>
+                                            <% else %>
+                                                <%=
+                                                    number_with_precision(
+                                                        summary_item[:total_revenue],
+                                                        precision: 2,
+                                                        delimiter: ','
+                                                    )
+                                                %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-6 pr-2">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            <em>This</em> & Pump Reconciliation Totals Match Check
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <th>Fuel</th>
+                                    <th class="text-right">Diff.</th>
+                                </thead>
+                                <tbody>
+                                    <% this_and_prt_match_check = @shift_inventory_update.pump_meter_reading_summary(:this_and_prt_match_check) %>
+                                    <% if this_and_prt_match_check.empty? %>
+
+                                    <% else %>
+                                        <% this_and_prt_match_check.each do |summary_item| %>
+                                            <% fuel = @fuels.find(summary_item[:fuel_id]) %>
+                                            <tr>
+                                                <td>
+                                                    <span class="badge fuel-badge-<%= fuel.ref_color %>">
+                                                         <%= fuel.symbols[0] %>
+                                                    </span>
+                                                    <%= fuel.name %>
+                                                </td>
+                                                <td class="text-right">
+                                                    <%=
+                                                        number_with_precision(
+                                                            summary_item[:diff],
+                                                            precision: 2,
+                                                            delimiter: ','
+                                                        )
+                                                    %> (<%= 
+                                                        number_with_precision(
+                                                            summary_item[:diff_pct],
+                                                            precision: 2
+                                                        )
+                                                    %>%)
+                                                </td>
+                                            </tr>
+                                        <% end %>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 pl-2">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            <em>This</em> & Dipstick Measurements Match Check
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <th>Tank</th>
+                                    <th class="text-right">Diff.</th>
+                                </thead>
+                                <tbody>
+                                    <% this_and_dm_match_check = @shift_inventory_update.pump_meter_reading_summary(:this_and_dm_match_check) %>
+                                    <% if this_and_dm_match_check.empty? %>
+
+                                    <% else %>
+                                        <% this_and_dm_match_check.each do |summary_item| %>
+                                            <% tank = @tanks.find(summary_item[:tank_id]) %>
+                                            <tr>
+                                                <td>
+                                                    <span class="badge fuel-badge-<%= tank.fuel.ref_color %>">
+                                                         <%= tank.fuel.symbols[0] %>
+                                                    </span>
+                                                    <%= tank.alias %>
+                                                </td>
+                                                <td class="text-right">
+                                                    <%=
+                                                        number_with_precision(
+                                                            summary_item[:diff],
+                                                            precision: 2,
+                                                            delimiter: ','
+                                                        )
+                                                    %> (<%= 
+                                                        number_with_precision(
+                                                            summary_item[:diff_pct],
+                                                            precision: 2
+                                                        )
+                                                    %>%)
+                                                </td>
+                                            </tr>
+                                        <% end %>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-5 pr-0">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            Revenue by Pump Nozzle
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <th colspan="3">Pump Nozzle</th>
+                                    <th class="text-right">Tot. Revenue</th>
+                                </thead>
+                                <tbody>
+                                    <% revenue_by_pump_nozzle = @shift_inventory_update.pump_meter_reading_summary(:revenue_by_pump_nozzle) %>
+                                    <% if revenue_by_pump_nozzle.empty? %>
+
+                                    <% else %>
+                                        <% revenue_by_pump_nozzle.each do |summary_item| %>
+                                            <% pump_nozzle = @pump_nozzles.find(summary_item[:pump_nozzle_id]) %>
+                                            <tr>
+                                                <td><%= pump_nozzle.pump_island_num %></td>
+                                                <td><%= pump_nozzle.loading_point_num %></td>
+                                                <td>
+                                                    <span class="badge fuel-badge-<%= pump_nozzle.tank.fuel.ref_color %>">
+                                                        <%= pump_nozzle.tank.fuel.symbols[0] %>
+                                                    </span>
+                                                </td>
+                                                <td class="text-right">
+                                                    <%=
+                                                        number_with_precision(
+                                                            summary_item[:revenue],
+                                                            precision: 2,
+                                                            delimiter: ','
+                                                        )
+                                                    %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            --
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    
+                                </thead>
+                                <tbody>
+                                    <% ## %>
+                                    <% if true %>
+                                    <% else %>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </div>
+    </div>
+
+    <div class="blurred-blocker" v-if="associationData.pumpMeterReadings.isSummaryOpen"
+        @click="associationData.pumpMeterReadings.isSummaryOpen = false">
+    </div>
+
+    <div class="summary-overflow-shadow"
+        :class="{ 'shown': !associationData.pumpMeterReadings.isSummaryOpen }">
+    </div>
+</div>

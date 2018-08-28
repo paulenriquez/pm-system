@@ -1,0 +1,95 @@
+<div class="overall-daily-summary">
+    <div class="">
+        <div class="row align-items-center justify-content-center">
+            <%
+                fuel_revenue = @day_totals[:fuel_revenue]
+                non_fuel_revenue = @day_totals[:non_fuel_revenue]
+                overall_revenue = fuel_revenue + non_fuel_revenue
+            %>
+            <div class="col revenue-container">
+                <% overall_chg = @day_totals[:overall_revenue_chg] %>
+                <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                    Overall Revenue
+                </h6>
+                <h1 class="mb-0 font-weight-light">
+                    ₱ <%=
+                        number_with_precision(
+                                overall_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                    %>
+                </h1>
+                <div class="fs-pt875">
+                    <% if !overall_chg.nil? %>
+                        <span class="mdi <%= get_icon_class(overall_chg) %> <%= get_text_class(overall_chg) %>">
+                            <strong>
+                                <%=
+                                    number_with_precision(overall_chg * 100, precision: 2)
+                                %>%
+                            </strong> 
+                        </span>
+                        <em>chg. from prev. day</em> 
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col revenue-container border-left">
+                <% fuel_chg = @day_totals[:fuel_revenue_chg] %>
+                <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                    Fuel Revenue
+                </h6>
+                <h1 class="mb-0 font-weight-light">
+                    ₱ <%=
+                        number_with_precision(
+                                fuel_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                    %>
+                </h1>
+                <div class="fs-pt875">
+                    <% if !fuel_chg.nil? %>
+                        <span class="mdi <%= get_icon_class(fuel_chg) %> <%= get_text_class(fuel_chg) %>">
+                            <strong>
+                                <%=
+                                    number_with_precision(fuel_chg * 100, precision: 2)
+                                %>%
+                            </strong> 
+                        </span>
+                        <em>chg. from prev. day</em> 
+                    <% end %>
+                </div>
+            </div>
+
+            <div class="col revenue-container border-left">
+                <% non_fuel_chg = @day_totals[:non_fuel_revenue_chg] %>
+                <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                    Non-Fuel Revenue
+                </h6>
+                <h1 class="mb-0 font-weight-light">
+                    ₱ <%=
+                        number_with_precision(
+                                non_fuel_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                    %>
+                </h1>
+                <div class="fs-pt875">
+                    <% if !non_fuel_chg.nil? %>
+                        <span class="mdi <%= get_icon_class(non_fuel_chg) %> <%= get_text_class(non_fuel_chg) %>">
+                            <strong>
+                                <%=
+                                    number_with_precision(non_fuel_chg * 100, precision: 2)
+                                %>%
+                            </strong> 
+                        </span>
+                        <em>chg. from prev. day</em> 
+                    <% end %>
+                </div>
+            </div>
+                
+        </div>
+    </div>
+</div>

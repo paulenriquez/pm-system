@@ -1,0 +1,286 @@
+<div class="deliveries-data row flex-nowrap">
+    <div class="col-7 delivery-items-container blurrable-panel"
+    :class="{ 'blurred': associationData.deliveries.isSummaryOpen }">
+        <div class="delivery-items-header pt-3 pl-3 pr-3 d-flex align-items-center">
+            <a id="button-expandAll"
+                class="btn btn-sm btn-light-darker with-icon mdi mdi-arrow-expand-down mr-2">
+                Expand All
+            </a>
+            <a id="button-collapseAll"
+                class="btn btn-sm btn-light-darker with-icon mdi mdi-arrow-collapse-up">
+                Collapse All
+            </a>
+        </div>
+        <div class="delivery-items p-3">
+            <%
+                deliveries = @shift_inventory_update.deliveries
+                deliveries.each do |delivery|
+            %>
+                <div class="card delivery-item">
+                    <div class="card-body p-0">
+                        <a class="collapse-link"
+                            data-toggle="collapse"
+                            href="#delivery-details-<%= delivery.id %>">
+                            <h6 class="so-num-text">
+                                <%
+                                    delivery_type = delivery.delivery_type
+                                    if delivery_type == 'NonFuel'
+                                        delivery_type = 'Non-Fuel'
+                                    end
+                                %>
+                                SO# <%= delivery.sales_order_num %> — <%= delivery_type %>
+                            </h6>
+                            <span class="toggle-icon mdi mdi-chevron-down"></span>
+                        </a>
+                    </div>
+                    <div class="collapse collapse-content"
+                        id="delivery-details-<%= delivery.id %>">
+                        <div class="card-body pl-3 pr-3 pb-3 pt-0">
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <div class="font-weight-bold fs-pt8">
+                                        Invoice Num.
+                                    </div>
+                                    <div>
+                                        <%= delivery.invoice_num %>
+                                    </div>
+                                </div>
+                                <div class="form-group col">
+                                    <div class="font-weight-bold fs-pt8">
+                                        Received by
+                                    </div>
+                                    <div>
+                                        <%= delivery.received_by.nil? ? 'n/a' : delivery.received_by %>
+                                    </div>
+                                </div>
+                                <div class="form-group col">
+                                    <div class="font-weight-bold fs-pt8">
+                                        Time received
+                                    </div>
+                                    <div>
+                                        <%= delivery.time_received.nil? ? 'n/a' : delivery.time_received.strftime('%I:%M %p') %>
+                                    </div>
+                                </div>
+                                <div class="form-group col">
+                                    <div class="font-weight-bold fs-pt8">
+                                        Amount
+                                    </div>
+                                    <div>
+                                        <% if !delivery.amount.nil? %>
+                                            ₱<%= 
+                                                number_with_precision(
+                                                    delivery.amount,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        <% else %>
+                                            n/a
+                                        <% end %>
+                                    </div>
+                                </div>
+                            </div>                            
+                            <table class="table table-sm">
+                                <thead>
+                                    <th>
+                                        <%= 
+                                            if delivery.delivery_type == 'Fuel'
+                                                'Fuel & Tank'
+                                            elsif delivery.delivery_type == 'NonFuel'
+                                                'Non-Fuel Product'
+                                            end
+                                        %>
+                                    </th>
+                                    <th class="text-right">
+                                        <%= 
+                                            if delivery.delivery_type == 'Fuel'
+                                                'Volume'
+                                            elsif delivery.delivery_type == 'NonFuel'
+                                                'Units'
+                                            end
+                                        %>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <% delivery.product_deliveries.each do |product_delivery| %>
+                                        <tr>
+                                            <td>
+                                                <% if delivery.delivery_type == 'Fuel' %>
+                                                    <span class="badge fuel-badge-<%= product_delivery.product.ref_color %>">
+                                                        <%= product_delivery.product.symbols[0] %>
+                                                    </span>
+                                                    <%= product_delivery.product.name %>
+                                                <% elsif delivery.delivery_type == 'NonFuel' %>
+                                                    <%= product_delivery.product.name %>
+                                                <% end %>
+                                            </td>
+                                            <td class="text-right">
+                                                <% if delivery.delivery_type == 'Fuel' %>
+                                                    <%= 
+                                                        number_with_precision(
+                                                            product_delivery.qty_delivered,
+                                                            precision: 2,
+                                                            delimiter: ','
+                                                        ) 
+                                                    %>
+                                                <% elsif delivery.delivery_type == 'NonFuel' %>
+                                                    <%= 
+                                                        number_with_precision(
+                                                            product_delivery.qty_delivered,
+                                                            precision: 0,
+                                                            delimiter: ','
+                                                        ) 
+                                                    %>
+                                                <% end %>
+                                            </td>
+                                        </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    </div>
+    <div class="collapsible-summary" :class="{ 'shown': associationData.deliveries.isSummaryOpen }">
+        <div class="delivery-summary-header pl-3 pr-3 d-flex align-items-center">
+            <a href="#" class="btn btn-lg btn-link pl-0 mdi"
+            :class="{
+                'mdi-chevron-left': !associationData.deliveries.isSummaryOpen,
+                'mdi-chevron-right': associationData.deliveries.isSummaryOpen
+            }"
+            @click="associationData.deliveries.isSummaryOpen = !associationData.deliveries.isSummaryOpen"></a>
+            <h6 class="mb-0">Summary</h6>
+        </div>
+        <div class="delivery-summary p-3">
+            <div class="card summary-table mb-3">
+                <div class="card-header">
+                    Total Deliveries and Amount by Product
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th class="text-right">Tot. Deliveries</th>
+                            <th class="text-right">Stock after delivery</th>
+                        </thead>
+                        <tbody>
+                            <%
+                                total_deliveries_by_product = @shift_inventory_update.delivery_summary(:total_deliveries_by_product)
+                                total_deliveries_by_product.sort_by! { |t| t[:type] }
+                            %>
+                            <% if total_deliveries_by_product.empty? %>
+
+                            <% else %>
+                                <% total_deliveries_by_product.each do |summary_item| %>
+                                    <% product = @products.find(summary_item[:product_id]) %>
+                                    <tr>
+                                        <td>
+                                            <% if summary_item[:type] == 'Fuel' %>
+                                                <span class="badge fuel-badge-<%= product.ref_color %>">
+                                                    <%= product.symbols[0] %>
+                                                </span>
+                                                <%= product.name %>
+                                            <% elsif summary_item[:type] == 'NonFuel' %>
+                                                <%= product.name %>
+                                            <% end %>
+                                        </td>
+                                        <td>
+                                            <%
+                                                delivery_type = summary_item[:type]
+                                                if delivery_type == 'NonFuel'
+                                                    delivery_type = 'Non-Fuel'
+                                                end
+                                                %>
+                                            <%= delivery_type %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_delivered],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:stock_after_delivery],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card summary-table">
+                <div class="card-header">
+                    Total Fuel Deliveries by Tank
+                </div>
+                <div class="card-body">
+                    <table>
+                        <thead>
+                            <th>Tank</th>
+                            <th class="text-right">Tot. Deliveries</th>
+                            <th class="text-right">Stock after delivery</th>
+                        </thead>
+                        <tbody>
+                            <%
+                                total_fuel_deliveries_by_tank = @shift_inventory_update.delivery_summary(:total_fuel_deliveries_by_tank)
+                                total_fuel_deliveries_by_tank.sort_by! { |t| t[:tank_num] }
+                            %>
+                            <% if total_fuel_deliveries_by_tank.empty? %>
+    
+                            <% else %>
+                                <% total_fuel_deliveries_by_tank.each do |summary_item| %>
+                                    <% tank = @tanks.find(summary_item[:tank_id]) %>
+                                    <tr>
+                                        <td>
+                                            <span class="badge fuel-badge-<%= tank.fuel.ref_color %>">
+                                                <%= tank.fuel.symbols[0] %>
+                                            </span>
+                                            <%= tank.alias %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:total_delivered],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                        <td class="text-right">
+                                            <%=
+                                                number_with_precision(
+                                                    summary_item[:stock_after_delivery],
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="blurred-blocker" v-if="associationData.deliveries.isSummaryOpen"
+        @click="associationData.deliveries.isSummaryOpen = false">
+    </div>
+
+    <div class="summary-overflow-shadow" :class="{ 'shown': !associationData.deliveries.isSummaryOpen }">
+    </div>
+</div>

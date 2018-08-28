@@ -1,0 +1,175 @@
+<div class="tab-pane fade delivery-item">
+    <div class="delivery-item-header pt-1 pr-3 pb-1 pl-3">
+        <h6 class="delivery-item-header-text mb-0">Delivery Item</h6>
+        <%= 
+            link_to_remove_association 'Remove', delivery,
+                wrapper_class: 'delivery-item',
+                class: 'btn btn-sm btn-danger btn-with-icon mdi mdi-close'
+        %>
+    </div>
+
+    <div class="delivery-type-selector p-3">
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label>Select the type of product that is being delivered.</label>
+                <div class="list-group list-group-horizontal equal-width">
+                    <a href="#" data-value="Fuel" class="list-group-item list-group-item-action select-delivery-type">
+                        <h6>Fuel</h6>
+                        <p class="mb-0 fs-pt9">
+                            Items will be grouped by each tank.
+                        </p>
+                    </a>
+                    <a href="#" data-value="NonFuel" class="list-group-item list-group-item-action select-delivery-type">
+                        <h6>Non-Fuel</h6>
+                        <p class="mb-0 fs-pt9">
+                            Items will be grouped by each product.
+                        </p>
+                    </a>
+                </div>
+                <div class="alert alert-warning mt-2 mb-0 p-2 pl-3 pr-3 fs-pt8">
+                    You won't be able to modify the delivery type once you've made your selection.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="delivery-item-fields-container p-3" style="display:none;">
+        <div class="form-group">
+            <h5 class="font-weight-normal mb-1">
+                <span class="delivery-type-text"></span> Delivery
+            </h5>
+            <h6 class="mb-4 font-weight-normal">
+                <%= 
+                    delivery.object.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                %>,
+                Shift # <%= delivery.object.shift_inventory_update.shift %>
+            </h6>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group mb-0 col-4">
+                <label class="required">Sales Order Num.</label>
+                <input class="form-control" id="input-salesOrderNum">
+            </div>
+            <div class="form-group ml-3 col">
+                <label>Received by</label>
+                <input class="form-control" id="input-receivedBy">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label class="required">Invoice Number</label>
+                <input class="form-control" id="input-invoiceNum">
+            </div>
+            <div class="form-group mb-0 ml-3 col-3">
+                <label>Time Received</label>
+                <input class="form-control" type="time" id="input-timeReceived" required>
+            </div>
+            <div class="form-group mb-0 col">
+                <div class="form-group">
+                    <label>Amount</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">₱</span>
+                        </div>
+                        <input class="form-control" id="input-amount">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="required">Product Deliveries</label>
+            <div class="card p-0 form-control">
+                <div class="card-body product-delivery-nested-form-container">
+                    <p class="fs-pt9">
+                        Select the <span class="item-to-select text-lowercase"></span> and enter the
+                        <span class="unit-description text-lowercase"></span> delivered in the form below
+                        to record <span class="delivery-type-text text-lowercase"></span> deliveries.
+                    </p>
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label class="required item-to-select"></label>
+                        </div>
+                        <div class="col-4">
+                            <label class="required unit-description"></label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group mb-0 col-6">
+                            <%= 
+                                render 'shared/tank_selector',
+                                    default_text: 'Select tank...',
+                                    html: {
+                                        id: 'select-tank',
+                                        style: 'display: none;',
+                                        class: 'full-width'
+                                    } 
+                            %>
+                            <%= 
+                                render 'shared/product_selector', 
+                                    show_only: 'NonFuel',
+                                    default_text: 'Select non-fuel...',
+                                    html: {
+                                        id: 'select-product',
+                                        style: 'display: none;',
+                                        class: 'full-width'
+                                    }
+                            %>
+                        </div>
+                        <div class="form-group mb-0 col-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control text-right" id="input-qtyDelivered">
+                                <div class="input-group-append">
+                                    <span class="input-group-text unit-measurement"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0 col">
+                            <%=
+                                link_to_add_association '', delivery, :product_deliveries,
+                                    partial: 'shift_inventory_updates/association_forms/product_delivery_fields',
+                                    form_name: 'product_delivery',
+                                    class: 'add-product-delivery-fields btn btn-secondary mdi mdi-plus'
+                            %>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 product-delivery-table-container">
+                    <table class="table" id="table-productDeliveries">
+                        <thead>
+                            <tr>
+                                <th><span class="product-description"></span></th>
+                                <th><span class="unit-description"></span></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%= delivery.simple_fields_for :product_deliveries do |product_delivery| %>
+                                <%= 
+                                    render 'shift_inventory_updates/association_forms/product_delivery_fields',
+                                        product_delivery: product_delivery
+                                %>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Remarks</label>
+            <textarea class="form-control" rows="3" id="input-remarks"></textarea>
+        </div>
+    </div>
+
+    <!-- HIDDEN FIELDS -->
+    <%= delivery.hidden_field :delivery_type,   class: 'delivery-type-field'   %>
+    <%= delivery.hidden_field :sales_order_num, class: 'sales-order-num-field' %>
+    <%= delivery.hidden_field :received_by,     class: 'received-by-field'     %>
+    <%= delivery.hidden_field :invoice_num,     class: 'invoice-num-field'     %>
+    <%= delivery.hidden_field :time_received,   class: 'time-received-field'   %>
+    <%= delivery.hidden_field :amount,          class: 'amount-field'          %>
+    <%= delivery.hidden_field :remarks,         class: 'remarks-field'         %>
+</div>

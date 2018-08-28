@@ -1,0 +1,15 @@
+<div class="row m-0">
+    <div class="col pl-0">
+        <div class="card card-shadow-1 mb-3">
+            <div class="card-body">
+                <h5 class="card-title mb-0">Fuel Sales Volume Forecaster</h5>
+                <hr>
+                <h2 class="font-weight-light mb-4"><%= @date.strftime('%b %d, %Y (%a)') %></h2>
+                <%= render_async async_fuel_forecasts_path do %>
+                    <%= render 'shared/async_loader' %>
+                <% end %>
+                <%= content_for :render_async %>
+            </div>
+        </div>
+    </div>
+</div>

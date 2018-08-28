@@ -1,0 +1,82 @@
+<%= simple_form_for @price_update, html: {class: 'form-partial'} do |price_update| %>
+    <div class="form-group">
+        <label class="required">Price Updates</label>
+        <div class="card p-0 form-control">
+            <div class="card-body price-update-nested-form-container">
+                <p class="fs-pt9">
+                    Update prices by selecting the product, entering the date when
+                    the price change will take effect, and the new price in the
+                    form below.
+                </p>
+                <div class="form-row">
+                    <div class="col-4">
+                        <label class="required">Product</label>
+                    </div>
+                    <div class="col-4">
+                        <label class="required">Effective On</label>
+                    </div>
+                    <div class="col-3">
+                        <label class="required">New Price</label>
+                    </div>
+                    <div class="col-1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group mb-0 col-4">
+                        <%= render 'shared/product_selector', html: { id: 'select-product', class: 'full-width' } %>
+                    </div>
+                    <div class="form-group mb-0 col-4">
+                        <input type="date" class="form-control" id="input-effectiveOn" required>
+                    </div>
+                    <div class="form-group mb-0 col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input type="text" class="form-control" id="input-newPrice">
+                        </div>
+                    </div>
+                    <div class="form-group mb-0 col-1">
+                        <%=
+                            link_to_add_association '', price_update, :product_price_updates,
+                            form_name: 'product_price_update',
+                            data: {
+                                'association-insertion-node': '#table-productPriceUpdates tbody',
+                                'association-insertion-method': 'append'
+                            },
+                            class: 'btn btn-secondary mdi mdi-plus'
+                        %>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0 product-price-updates-table-container">
+                <table class="table" id="table-productPriceUpdates">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Effective On</th>
+                            <th>New Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%= price_update.simple_fields_for :product_price_updates do |product_price_update| %>
+                            <%= render 'product_price_update_fields', product_price_update: product_price_update %>
+                        <% end %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Remarks</label>
+        <textarea class="form-control" rows="3" v-model="priceUpdate.remarks"></textarea>
+    </div>
+
+    <%= price_update.submit 'Save', class: 'btn btn-primary' %>
+
+    <!-- HIDDEN FIELDS -->
+    <%= price_update.hidden_field :remarks, id: 'price_update_remarks', 'v-bind:value': 'priceUpdate.remarks' %>
+    
+<% end %>

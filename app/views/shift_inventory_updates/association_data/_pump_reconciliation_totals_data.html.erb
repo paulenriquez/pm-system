@@ -1,0 +1,222 @@
+<div class="pump-reconciliation-totals-data row flex-nowrap">
+    <div class="col-9 pump-reconciliation-total-items-container blurrable-panel"
+        :class="{ 'blurred': associationData.pumpReconciliationTotals.isSummaryOpen }">
+        <div class="pump-reconciliation-total-items p-3">
+            <table class="table table-bordered"
+                id="table-pumpReconciliationTotals">
+                <thead>
+                    <th>Fuel</th>
+                    <th>Beginning Bal.</th>
+                    <th>Ending Bal.</th>
+                    <th>Adj.</th>
+                    <th>Dispensed</th>
+                </thead>
+                <tbody>
+                    <% @fuels.each do |fuel| %>
+                        <%
+                            pump_reconciliation_total = fuel.pump_reconciliation_totals.find_by(
+                                shift_inventory_update_id: @shift_inventory_update.id
+                            )
+                        %>
+                        <tr>
+                            <td>
+                                <%= fuel.name %>
+                                <div>
+                                    <% fuel.symbols.each do |symbol| %>
+                                        <span class="badge fuel-badge-<%= fuel.ref_color %>-sm">
+                                            <%= symbol %>
+                                        </span>
+                                    <% end %>
+                                </div>
+                            </td>
+
+                            <% if pump_reconciliation_total.nil? %>
+                                <td class="text-center" colspan="4">
+                                    <em class="text-muted">No record</em>
+                                </td>
+                            <% else %>
+                                <td>
+                                    <% if !pump_reconciliation_total.chron_prev.nil? %>
+                                        <span class="val">
+                                            <%= 
+                                                number_with_precision(
+                                                    pump_reconciliation_total.beginning_bal,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                )
+                                            %>
+                                        </span>
+                                        <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="Successfully linked the previous shift's pump reconciliation total to this record.">
+                                        </a>
+                                    <% elsif !pump_reconciliation_total.nearest_prev.nil? %>
+                                        <span class="val">
+                                            <%= 
+                                                number_with_precision(
+                                                    pump_reconciliation_total.beginning_bal,
+                                                    precision: 2,
+                                                    delimiter: ','
+                                                ) 
+                                            %>
+                                        </span>
+                                        <%
+                                            expected_date =  pump_reconciliation_total.shift_inventory_update.expected_prev[:date].strftime('%b %d, %Y (%a)')
+                                            expected_shift =  pump_reconciliation_total.shift_inventory_update.expected_prev[:shift]
+                                            fuel_symbol = pump_reconciliation_total.fuel.symbols[0]
+                                            nearest_date = pump_reconciliation_total.nearest_prev.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                                            nearest_shift = pump_reconciliation_total.nearest_prev.shift_inventory_update.shift
+                                        %>
+                                        <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-title="Check the previous shift!"
+                                            data-content="Can't find the <strong><%= "#{expected_date}, Shift # #{expected_shift}" %></strong>
+                                                pump reconciliation total for <%= fuel_symbol %>. Took the one from
+                                                <%= "#{nearest_date}, Shift # #{nearest_shift}" %> instead.">
+                                        </a>
+                                    <% else %>
+                                        <span class="val text-muted">n/a</span>
+                                        <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                                            data-toggle="popover"
+                                            data-trigger="hover"
+                                            data-placement="bottom"
+                                            data-content="This is the first pump reconciliation total for this fuel.">
+                                        </a>
+                                    <% end %>
+                                </td>
+                                <td>
+                                    <%= 
+                                        number_with_precision(
+                                            pump_reconciliation_total.ending_bal,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <%= 
+                                        number_with_precision(
+                                            pump_reconciliation_total.calibration,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>
+                                </td>
+                                <td>
+                                    <% if !pump_reconciliation_total.dispensed.nil?  %>
+                                        <%= 
+                                            number_with_precision(
+                                                pump_reconciliation_total.dispensed,
+                                                precision: 2,
+                                                delimiter: ','
+                                            )
+                                        %>
+                                    <% else %>
+                                        <span class="text-muted">n/a</span>
+                                    <% end %>
+                                </td>
+                            <% end %>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="collapsible-summary"
+        :class="{ 'shown': associationData.pumpReconciliationTotals.isSummaryOpen }">
+        <div class="pump-reconciliation-total-summary-header d-flex align-items-center pl-3 pr-3">
+            <a href="#" class="btn btn-lg btn-link pl-0 mdi"
+            :class="{
+                'mdi-chevron-left': !associationData.pumpReconciliationTotals.isSummaryOpen,
+                'mdi-chevron-right': associationData.pumpReconciliationTotals.isSummaryOpen
+            }"
+            @click="associationData.pumpReconciliationTotals.isSummaryOpen = !associationData.pumpReconciliationTotals.isSummaryOpen"></a>
+            <h6 class="mb-0">Summary</h6>
+        </div>
+        <div class="pump-reconciliation-total-summary p-3">
+            <div class="row">
+                <div class="col-6 pr-2">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            <em>This</em> & Pump Meter Readings Match Check
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <th>Fuel</th>
+                                    <th class="text-right">Match?</th>
+                                </thead>
+                                <tbody>
+                                    <% @shift_inventory_update.pump_reconciliation_total_summaries.each do |pump_reconciliation_total_summary| %>
+                                        <%
+                                            fuel = @fuels.find(pump_reconciliation_total_summary[:fuel_id])
+                                        %>
+                                        <tr>
+                                            <td>
+                                                <span class="badge badge-secondary"><%= fuel.symbols[0] %></span>
+                                                <%= fuel.name %>
+                                            </td>
+                                            <td class="text-right">
+                                                <% if pump_reconciliation_total_summary[:pmr_prt_diff] != 0 %>
+                                                    No
+                                                    <a class="mdi mdi-alert text-secondary ml-2"
+                                                        data-toggle="popover"
+                                                        data-trigger="hover"
+                                                        data-placement="bottom"
+                                                        data-content="test test">
+                                                    </a>
+                                                    <div class="text-muted fs-pt8">
+                                                        off by
+                                                        <%=
+                                                            number_with_precision(
+                                                                pump_reconciliation_total_summary[:pmr_prt_diff],
+                                                                precision: 2,
+                                                                delimiter: ','
+                                                            )
+                                                        %>
+                                                    </div>
+                                                <% else %>
+                                                    Yes
+
+                                                <% end %>
+                                            </td>
+                                        </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 pl-2">
+                    <div class="card summary-table">
+                        <div class="card-header">
+                            <em>This</em> & Dipstick Measurements Match Check
+                        </div>
+                        <div class="card-body">
+                            <table>
+                                <thead>
+                                    <th>Fuel</th>
+                                    <th class="text-right">Match?</th>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="blurred-blocker" v-if="associationData.pumpReconciliationTotals.isSummaryOpen"
+        @click="associationData.pumpReconciliationTotals.isSummaryOpen = false">
+    </div>
+    <div class="summary-overflow-shadow"
+        :class="{ 'shown': !associationData.pumpReconciliationTotals.isSummaryOpen }">
+    </div>
+</div>

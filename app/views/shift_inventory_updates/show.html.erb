@@ -1,0 +1,136 @@
+<div class="row m-0">
+    <div class="col pl-0">
+        <div class="card card-shadow-1 show-container">
+            <div class="card-body">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="card-title">View Shift Inventory Update</h5>
+                    <a class="btn btn-light btn-light-darker with-icon mdi mdi-pencil"
+                        href="<%= 
+                            load_shift_inventory_update_form_path(
+                                date: @shift_inventory_update.date,
+                                shift: @shift_inventory_update.shift
+                            ) 
+                        %>">
+                        Edit
+                    </a>
+                </div>
+                <div class="form-group mb-4">
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Date and Shift</label>
+                        </div>
+                        <div class="col">
+                            <label>Remarks</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <%= render 'date_shift_nav' %>
+                       </div>
+                        <div class="col">
+                            <textarea class="form-control-plaintext-bordered h-100" readonly><%= @shift_inventory_update.remarks %></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <small class="text-muted">Use the link buttons to navigate between dates and shifts.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body d-flex justify-content-center align-items-center pt-3 pb-3">
+                        <ul class="nav nav-pills nav-justified w-50" id="tabs-general">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#shift-summary">Shift Summary</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#form-data">Form Data</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <hr class="m-0">
+                    <div class="card-body p-0 tab-general">
+                        <div class=" tab-content tab-content-general" id="tabs-generalContent">
+                            <div class="pane-general tab-pane fade show active" id="shift-summary">
+                                <%= render_async async_shift_summary_path(shift_inventory_update_id: @shift_inventory_update.id) do %>
+                                    <%= render 'shared/async_loader' %>
+                                <% end %>
+                                <%= content_for :render_async %>
+                            </div>
+                            <div class="pane-general tab-pane fade" id="form-data">
+                                <div class="card border-0 rounded-bottom tab-data">
+                                    <div class="card-header">
+                                        <ul class="nav nav-tabs card-header-tabs" id="tabs-data">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-toggle="tab" href="#deliveries">
+                                                    Deliveries
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#fuel-sales">
+                                                    Fuel Sales
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#dipstick-measurements">
+                                                    Dipstick Measurements
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#calibrations">
+                                                    Calibrations
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#pump-meter-readings">
+                                                    Pump Meter Readings
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#pump-reconciliation-totals">
+                                                    Pump Reconciliation Totals
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-toggle="tab" href="#non-fuel-sales">
+                                                    Non-Fuel Sales
+                                                </a>
+                                            </li>
+                                        </ul>    
+                                    </div>
+                                    <div class="card-body p-0 tab-content-data-container">
+                                        <div class="tab-content tab-content-data" id="tabs-dataContent">
+                                            <div class="tab-pane pane-data fade show active" id="deliveries">
+                                                <%= render 'shift_inventory_updates/association_data/deliveries_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="fuel-sales">
+                                                <%= render 'shift_inventory_updates/association_data/fuel_sales_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="dipstick-measurements">
+                                                <%= render 'shift_inventory_updates/association_data/dipstick_measurements_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="calibrations">
+                                                <%= render 'shift_inventory_updates/association_data/calibrations_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="pump-meter-readings">
+                                                <%= render 'shift_inventory_updates/association_data/pump_meter_readings_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="pump-reconciliation-totals">
+                                                <%= render 'shift_inventory_updates/association_data/pump_reconciliation_totals_data' %>
+                                            </div>
+                                            <div class="tab-pane pane-data fade" id="non-fuel-sales">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

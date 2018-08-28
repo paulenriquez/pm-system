@@ -1,0 +1,91 @@
+<tr class="dipstick-measurement-item">
+    <td class="fuel-tank-col">
+        <div class="fuel-text-<%= dipstick_measurement.object.tank.fuel.ref_color %>">
+            <%= dipstick_measurement.object.tank.fuel.symbols[0] %>
+        </div>
+        <div class="fs-pt8">
+            <%= dipstick_measurement.object.tank.alias %>
+        </div>
+    </td>
+    <td class="beginning-amt-col">
+        <% if !dipstick_measurement.object.chron_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        dipstick_measurement.object.beginning_amt,
+                        precision: 2,
+                        delimiter: ','
+                    )
+                %>
+            </span>
+            <a class="mdi mdi-ray-start-arrow text-success ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="Successfully linked the previous shift's dipstick measurement to this record.">
+            </a>
+        <% elsif !dipstick_measurement.object.nearest_prev.nil? %>
+            <span class="val">
+                <%= 
+                    number_with_precision(
+                        dipstick_measurement.object.beginning_amt,
+                        precision: 2,
+                        delimiter: ','
+                    ) 
+                %>
+            </span>
+            <%
+                expected_date =  dipstick_measurement.object.shift_inventory_update.expected_prev[:date].strftime('%b %d, %Y (%a)')
+                expected_shift =  dipstick_measurement.object.shift_inventory_update.expected_prev[:shift]
+                tank_alias = dipstick_measurement.object.tank.alias
+                nearest_date = dipstick_measurement.object.nearest_prev.shift_inventory_update.date.strftime('%b %d, %Y (%a)')
+                nearest_shift = dipstick_measurement.object.nearest_prev.shift_inventory_update.shift
+            %>
+            <a class="mdi mdi-ray-start-arrow text-warning ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-title="Check the previous shift!"
+                data-content="Can't find the <strong><%= "#{expected_date}, Shift # #{expected_shift}" %></strong>
+                    dipstick measurement for <%= tank_alias %>. Took the one from
+                    <%= "#{nearest_date}, Shift # #{nearest_shift}" %> instead.">
+            </a>
+        <% else %>
+            <span class="val text-muted">n/a</span>
+            <a class="mdi mdi-ray-start-arrow text-secondary ml-2"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="bottom"
+                data-content="This is the first dipstick measurement for this tank.">
+            </a>
+        <% end %>
+    </td>
+    <td class="deliveries-col">
+
+    </td>
+    <td class="dispensed-col">
+        
+    </td>
+    <td class="ending-amt-col">
+
+    </td>
+    <td class="converted-vol-col">
+        <div class="input-group">
+            <input id="input-convertedVol" class="form-control" autocomplete="off">
+            <div class="input-group-append">
+                <span class="input-group-text">L</span>
+            </div>
+        </div>
+    </td>
+    <td class="difference-col">
+    
+    </td>
+
+    <td style="display:none;">
+        <%= dipstick_measurement.hidden_field :tank_id,       class: 'tank-id-field'       %>
+        <%= dipstick_measurement.hidden_field :converted_vol, class: 'converted-vol-field' %>
+        <% if !dipstick_measurement.object.id.nil? %>
+            <%= dipstick_measurement.hidden_field :_destroy, class: '_destroy-field', value: false %>
+        <% end %>
+    </td>
+</tr>

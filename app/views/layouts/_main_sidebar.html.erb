@@ -1,0 +1,64 @@
+<div class="main-sidebar card-shadow-2">
+    <div class="sidebar-header">
+        <%= image_tag('system-logo.png', class: 'system-logo-img') %>
+    </div>
+
+    <div class="sidebar-items">
+        <p class="menu-label">General</p>
+        <ul class="menu">
+            <li class="menu-item <%= 'active' if request.path == dashboard_path %>">
+                <a href="<%= dashboard_path %>">Dashboard</a>
+            </li>
+            <li class="menu-item <%= 'active' if controller_name == 'inventory_and_sales' %>">
+                <a href="<%= inventory_and_sales_path %>">Inventory & Sales</a>
+            </li>
+            <li class="menu-item <%= 'active' if controller_name == 'forecasts' %>">
+                <a href="<%= forecasts_path %>">Forecasts</a>
+            </li>
+        </ul>
+        <p class="menu-label">Inventory Management</p>
+        <ul class="menu">
+            <li class="menu-item <%= 'active' if controller_name == 'shift_inventory_updates' %>">
+                <a href="<%= shift_inventory_updates_path %>">Shift Inventory Updates</a>
+            </li>
+            <ul class="menu sub-menu">
+                <li class="menu-item">
+                    <a href="#">Deliveries</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Fuel Sales</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Dipstick Measurements</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Calibrations</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Pump Meter Readings</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Pump Reconciliation Totals</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">Non-Fuel Sales</a>
+                </li>
+            </ul>
+            <li class="menu-item <%= 'active' if controller_name == 'price_updates' %>">
+                <a href="<%= price_updates_path %>">Price Updates</a>
+            </li>
+        </ul>
+        <p class="menu-label">Station Assets</p>
+        <ul class="menu">
+            <li class="menu-item <%= 'active' if controller_name == 'products' %>">
+                <a href="<%= products_path %>">Products</a>
+            </li>
+            <li class="menu-item <%= 'active' if controller_name == 'pump_nozzles' %>">
+                <a href="<%= pump_nozzles_path %>">Pump Nozzles</a>
+            </li>
+            <li class="menu-item <%= 'active' if controller_name == 'tanks' %>">
+                <a href="<%= tanks_path %>">Tanks</a>
+            </li>
+        </ul>
+    </div>
+</div>

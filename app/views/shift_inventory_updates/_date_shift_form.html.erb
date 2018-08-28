@@ -1,0 +1,31 @@
+
+<div class="row m-0">
+    <div class="col pl-0">
+        <div class="card card-shadow-1 form-container">
+            <div class="card-body">
+                <h5 class="card-title">Open Shift Inventory Update</h5>
+                <%= simple_form_for @shift_inventory_update, method: :post, url: load_shift_inventory_updates_path do |shift_inventory_update| %>
+                    <p class="fs-pt9 text-muted mb-4">
+                        You may use this form to freely open a shift inventory update from a
+                        specific date and shift.
+                    </p>
+                    <div class="form-group">
+                        <label class="required">Date</label>
+                        <input class="form-control" type="date" v-model="shiftInventoryUpdate.date">
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="required">Shift</label>
+                        <input class="form-control" v-model="shiftInventoryUpdate.shift">
+                    </div>
+
+                    <%= shift_inventory_update.submit 'Open', class: 'btn btn-primary' %>
+
+                    <!-- HIDDEN FIELDS -->
+                    <%= shift_inventory_update.hidden_field :date,  id: 'shift_inventory_update_date',  'v-bind:value': 'shiftInventoryUpdate.date'  %>
+                    <%= shift_inventory_update.hidden_field :shift, id: 'shift_inventory_update_shift', 'v-bind:value': 'shiftInventoryUpdate.shift' %>
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Petron Bagumbayan DSS</title>
+    <%= csrf_meta_tags %>
+    
+    <%= stylesheet_link_tag 'application', media: 'all' %>  
+    <%= javascript_include_tag 'application' %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+
+  <body>
+    <% if controller_name == 'sessions' && action_name == 'new' %>
+      <div id="app" class="view-container <%= "#{controller_name}-controller #{action_name}-view" %>"
+        data-controller="<%= controller_name %>" data-action="<%= action_name %>">
+        <%= yield %>
+      </div>
+    <% else %>
+      <div>
+        <%= render 'layouts/main_sidebar' %>
+        <%= render 'layouts/main_content', yield: yield %>
+      </div>
+    <% end %>
+  </body>
+</html>

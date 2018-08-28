@@ -1,0 +1,37 @@
+.main-content {
+    margin-left: $main-sidebar-width;
+    height: 100%;
+    z-index: 0;
+
+    .content-loader {
+        position: fixed;
+        margin-left: $main-sidebar-width;
+        width: calc(100vw - #{$main-sidebar-width});
+        z-index: 2000;
+        background-color: $main-content-loading-dimmer-bg !important;
+        display: flex;
+
+        transition: visibility 0.35s, opacity 0.35s ease;
+        visibility: hidden;
+        opacity: 0;
+
+        &.active {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+
+    .view-container {
+        padding: $main-content-padding;
+        padding-top: calc(#{$main-navbar-height} + #{$main-content-padding});
+        padding-bottom: $main-content-padding-bottom;
+        min-height: 100vh;
+
+        transition: filter 0.35s ease;
+        filter: blur(0px);
+
+        &.blurred {
+            filter: blur(#{$main-content-loading-blur});
+        }
+    }
+}

@@ -1,0 +1,10 @@
+<div class="main-content">
+    <%= render 'layouts/main_navbar' %>
+    <div class="ui inverted dimmer content-loader">
+        <div class="ui loader"></div>
+    </div>
+    <div id="app" class="view-container <%= "#{controller_name}-controller #{action_name}-view" %>"
+        data-controller="<%= controller_name %>" data-action="<%= action_name %>">
+        <%= yield %>
+    </div>
+</div>

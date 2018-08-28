@@ -1,0 +1,2 @@
+module ShiftInventoryUpdatesHelper
+end

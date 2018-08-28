@@ -1,0 +1,131 @@
+<div class="shift-summary">
+    <div class="row">
+        <div class="col">
+            <div class="row align-items-center justify-content-center">
+                <%
+                    fuel_revenue = shift_inventory_update.fuel_revenue
+                    non_fuel_revenue = shift_inventory_update.non_fuel_revenue
+                    overall_revenue = fuel_revenue + non_fuel_revenue
+                %>
+                <div class="col revenue-container">
+                    <% overall_chg = shift_inventory_update.overall_revenue_chg %>
+                    <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                        Overall Revenue
+                    </h6>
+                    <h1 class="mb-0 font-weight-light">
+                        ₱ <%=
+                            number_with_precision(
+                                    overall_revenue,
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                        %>
+                    </h1>
+                    <div class="fs-pt875">
+                        <% if !overall_chg.nil? %>
+                            <span class="mdi <%= get_icon_class(overall_chg) %> <%= get_text_class(overall_chg) %>">
+                                <strong>
+                                    <%=
+                                        number_with_precision(overall_chg * 100, precision: 2)
+                                    %>%
+                                </strong> 
+                            </span>
+                            <em>chg. from prev. Shift # <%= shift_inventory_update.shift %></em> 
+                        <% end %>
+                    </div>
+                </div>
+
+                <div class="col revenue-container border-left">
+                    <% fuel_chg = shift_inventory_update.fuel_revenue_chg %>
+                    <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                        Fuel Revenue
+                    </h6>
+                    <h1 class="mb-0 font-weight-light">
+                        ₱ <%=
+                            number_with_precision(
+                                    fuel_revenue,
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                        %>
+                    </h1>
+                    <div class="fs-pt875">
+                        <% if !fuel_chg.nil? %>
+                            <span class="mdi <%= get_icon_class(fuel_chg) %> <%= get_text_class(fuel_chg) %>">
+                                <strong>
+                                    <%=
+                                        number_with_precision(fuel_chg * 100, precision: 2)
+                                    %>%
+                                </strong> 
+                            </span>
+                            <em>chg. from prev. Shift # <%= shift_inventory_update.shift %></em> 
+                        <% end %>
+                    </div>
+                </div>
+
+                <div class="col revenue-container border-left">
+                    <% non_fuel_chg = shift_inventory_update.non_fuel_revenue_chg %>
+                    <h6 class="font-weight-bold fs-pt875 text-secondary text-uppercase">
+                        Non-Fuel Revenue
+                    </h6>
+                    <h1 class="mb-0 font-weight-light">
+                        ₱ <%=
+                            number_with_precision(
+                                    non_fuel_revenue,
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                        %>
+                    </h1>
+                    <div class="fs-pt875">
+                        <% if !non_fuel_chg.nil? %>
+                            <span class="mdi <%= get_icon_class(non_fuel_chg) %> <%= get_text_class(non_fuel_chg) %>">
+                                <strong>
+                                    <%=
+                                        number_with_precision(non_fuel_chg * 100, precision: 2)
+                                    %>%
+                                </strong> 
+                            </span>
+                            <em>chg. from prev. Shift # <%= shift_inventory_update.shift %></em> 
+                        <% end %>
+                    </div>
+                </div>
+                
+            </div>
+
+            <hr>
+
+            <div class="card tab-per-product-summary">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="tabs-perProductSummary">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#fuel-summary">
+                                Fuel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#non-fuel-summary">
+                                Non-Fuel
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body tab-content-per-product-summary-container">
+                    <div class="tab-content tab-content-per-product-summary"
+                        id="tabs-perProductSummaryContent">
+                        <div class="tab-pane pane-product-summary show active" id="fuel-summary">
+                            <%= render_async async_fuel_summary_path(shift_inventory_update_id: shift_inventory_update.id) do %>
+                                <%= render 'shared/async_loader' %>
+                            <% end %>
+                            <%= content_for :render_async %>
+                        </div>
+                        <div class="tab-pane pane-product-summary" id="non-fuel-summary">
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

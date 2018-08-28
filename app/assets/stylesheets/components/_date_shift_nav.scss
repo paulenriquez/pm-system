@@ -1,0 +1,64 @@
+.date-shift-nav {
+    border: none;
+
+    .date-container {
+        border-top-left-radius: $card-border-radius;
+        border-top-right-radius: $card-border-radius;
+        border-top: 1px solid $card-border-color;
+        border-left: 1px solid $card-border-color;
+        border-right: 1px solid $card-border-color;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .btn {
+            font-size: 2rem;
+        }
+    }
+
+    .shift-links-container {
+        .list-group-item {
+            border: 1px solid $card-border-color;
+            padding-left: $input-padding-x;
+            padding-right: $input-padding-x;
+            text-align: center;
+            color: $link-color;
+            background-color: $card-bg;
+
+            &:first-child {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: $card-border-radius;
+            }
+            &:not(:first-child) {
+                border-radius: 0;
+                margin-left: -1px;
+            }
+            &:last-child {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: $card-border-radius;
+            }
+
+            &:hover {
+                background-color: darken(map-get($theme-colors, 'light'), 3.5%);
+                color: color-yiq( darken(map-get($theme-colors, 'light'), 3.5%) );
+            }
+
+            &:focus {
+                background-color: $card-bg;
+                background-color: darken(map-get($theme-colors, 'light'), 7.5%);
+                color: color-yiq( darken(map-get($theme-colors, 'light'), 7.5%) );
+            }
+
+            &:active {
+                background-color: darken(map-get($theme-colors, 'light'), 7.5%);
+                color: color-yiq( darken(map-get($theme-colors, 'light'), 7.5%) );
+            }
+
+            &.active {
+                background-color: darken(map-get($theme-colors, 'light'), 3.5%);
+                color: color-yiq( darken(map-get($theme-colors, 'light'), 3.5%) );
+            }
+        }
+    }
+}

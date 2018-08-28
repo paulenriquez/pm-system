@@ -1,0 +1,355 @@
+<div class="fuel-summary p-3">
+    <div class="summary-header">
+        <h3 class="header-text">
+            Fuel Inventory Snapshot
+        </h3>
+        <h6 class="date-shift-text">
+            <%= shift_inventory_update.date.strftime('%b %d, %Y (%a)') %>,
+            Shift # <%= shift_inventory_update.shift %>
+            (<%= ShiftInventoryUpdate.hours_str(shift_inventory_update.shift) %>)
+        </h6>
+        <div class="report-gen-links">
+            <a href="#" class="btn btn-link">Download as PDF</a>
+            <a href="#" class="btn btn-link">Download as XLS</a>
+            <a href="#" class="btn btn-link">Download as CSV</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="charts-container mb-5 d-flex flex-col justify-content-between">
+        <%=
+            line_chart fuel_volume_by_shift_chart_path(
+                    date: shift_inventory_update.date, shift: shift_inventory_update.shift
+                ),
+                defer: false,
+                xtitle: 'Date & Shift',
+                ytitle: 'Volume (L)',
+                height: '30rem',
+                width: '65%',
+                library: { 
+                    title: { text: 'Fuel Volume by Shift' },
+                    animation: { duration: 1000 },
+                    scales: {
+                        xAxes: [{
+                            ticks: { minRotation: 45, maxRotation: 45}
+                        }],
+                        yAxes: [{
+                            ticks: { stepSize: 500 }
+                        }]
+                    }
+                } 
+        %>
+        <%=
+            pie_chart shift_fuel_volume_breakdown_chart_path(
+                    date: shift_inventory_update.date, shift: shift_inventory_update.shift
+                ),
+                defer: false,
+                donut: true,
+                legend: 'bottom',
+                height: '30rem',
+                width: '25%',
+                library: { 
+                   title: { text: 'Volume Breakdown' },
+                   animation: { animateRotate: true },
+                   cutoutPercentage: 80
+                }
+        %>
+    </div>
+
+    <hr class="mb-5">
+
+    <div class="tables-container">
+        <h6 class="text-uppercase font-weight-bold fs-pt875">Inventory & Revenue by Fuel</h6>
+        <table class="table table-compressed mb-5">
+            <thead>
+                <th>Fuel</th>
+                <th class="text-right">Beginning</th>
+                <th class="text-right">Deliveries</th>
+                <th class="text-right">Dispensed</th>
+                <th class="text-right">Ending</th>
+                <th class="text-right">Actual</th>
+                <th class="text-right">Diff.</th>
+                <th class="text-right">Revenue</th>
+            </thead>
+            <tbody>
+                <% fuel_revenue = 0 %>
+                <% @fuels.each do |fuel| %>
+                    <%
+                        date = shift_inventory_update.date
+                        shift = shift_inventory_update.shift
+                    %>
+                    <tr>
+                        <td class="align-middle">
+                            <div class="fuel-text-<%= fuel.ref_color %>">
+                                <%= fuel.symbols[0] %>
+                            </div>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% beginning_inventory = fuel.beginning_inventory(date, shift) %>
+                            <% if beginning_inventory.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        beginning_inventory,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    fuel.total_deliveries(date, shift),
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    fuel.total_dispensed(date, shift),
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% ending_inventory = fuel.ending_inventory(date, shift) %>
+                            <% if ending_inventory.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        ending_inventory,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% actual_count = fuel.actual_count(date, shift) %>
+                            <% if actual_count.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        actual_count,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% difference = fuel.difference(date, shift) %>
+                            <% if difference.nil? %>
+                                <div class="text-muted">n/a</div>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        difference,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                                <div class="fs-pt8">
+                                    (<%=
+                                        number_with_precision(
+                                            fuel.difference_pct(date, shift),
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>%)
+                                </div>
+                            <% end %>
+                        </td>
+
+                        <td class="text-right align-middle">
+                            <% total_revenue = fuel.total_revenue(date, shift) %>
+                            <% if total_revenue.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        total_revenue,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                                <% fuel_revenue += total_revenue %>
+                            <% end %>
+                        </td>
+                    </tr>
+
+                <% end %>
+                <tr class="last-row">
+                    <td colspan="7" class="align-middle text-right fs-pt875 text-uppercase">
+                        <em>Total</em>
+                    </td>
+                    <td class="align-middle text-right font-weight-bold td-uncompressed">
+                        <%=
+                            number_with_precision(
+                                fuel_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                        %>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h6 class="text-uppercase font-weight-bold fs-pt875">Inventory & Revenue by Tank</h6>
+        <table class="table table-compressed">
+            <thead>
+                <th>Tank</th>
+                <th class="text-right">Beginning</th>
+                <th class="text-right">Deliveries</th>
+                <th class="text-right">Dispensed</th>
+                <th class="text-right">Ending</th>
+                <th class="text-right">Actual</th>
+                <th class="text-right">Diff.</th>
+                <th class="text-right">Revenue</th>
+            </thead>
+            <tbody>
+                <% tank_revenue = 0 %>
+                <% @tanks.each do |tank| %>
+                    <%
+                        date = shift_inventory_update.date
+                        shift = shift_inventory_update.shift
+                    %>
+                    <tr>
+                        <td class="align-middle">
+                            <div class="fuel-text-<%= tank.fuel.ref_color %>">
+                                <%= tank.fuel.symbols[0] %>
+                            </div>
+                            <div class="fs-pt8">
+                                <%= tank.alias %>
+                            </div>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% beginning_stock = tank.beginning_stock(date, shift) %>
+                            <% if beginning_stock.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        beginning_stock,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    tank.total_deliveries(date, shift),
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <%=
+                                number_with_precision(
+                                    tank.total_dispensed(date, shift),
+                                    precision: 2,
+                                    delimiter: ','
+                                )
+                            %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% ending_stock = tank.ending_stock(date, shift) %>
+                            <% if ending_stock.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        ending_stock,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% actual_count = tank.actual_count(date, shift) %>
+                            <% if actual_count.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        actual_count,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                            <% end %>
+                        </td>
+                        <td class="text-right align-middle">
+                            <% difference = tank.difference(date, shift) %>
+                            <% if difference.nil? %>
+                                <div class="text-muted">n/a</div>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        difference,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                                <div class="fs-pt8">
+                                    (<%=
+                                        number_with_precision(
+                                            tank.difference_pct(date, shift) * 100,
+                                            precision: 2,
+                                            delimiter: ','
+                                        )
+                                    %>%)
+                                </div>
+                            <% end %>
+                        </td>
+
+                        <td class="text-right align-middle">
+                            <% total_revenue = tank.total_revenue(date, shift) %>
+                            <% if total_revenue.nil? %>
+                                <span class="text-muted">n/a</span>
+                            <% else %>
+                                <%=
+                                    number_with_precision(
+                                        total_revenue,
+                                        precision: 2,
+                                        delimiter: ','
+                                    )
+                                %>
+                                <% tank_revenue += total_revenue %>
+                            <% end %>
+                        </td>
+                    </tr>
+                <% end %>
+                <tr class="last-row">
+                    <td colspan="7" class="align-middle text-right fs-pt875 text-uppercase">
+                        <em>Total</em>
+                    </td>
+                    <td class="align-middle text-right font-weight-bold td-uncompressed">
+                        <%=
+                            number_with_precision(
+                                tank_revenue,
+                                precision: 2,
+                                delimiter: ','
+                            )
+                        %>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
